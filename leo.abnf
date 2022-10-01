@@ -79,7 +79,6 @@ line-comment = "//" *not-line-feed-or-carriage-return
 keyword = %s"address"
         / %s"async"
         / %s"bool"
-        / %s"circuit"
         / %s"console"
         / %s"const"
         / %s"constant"
@@ -105,6 +104,7 @@ keyword = %s"address"
         / %s"return"
         / %s"scalar"
         / %s"string"
+        / %s"struct"
         / %s"u8"
         / %s"u16"
         / %s"u32"
@@ -267,7 +267,7 @@ primary-expression = literal
                    / free-function-call
                    / static-function-call
                    / tuple-expression
-                   / circuit-expression
+                   / struct-expression
 
 variable-or-free-constant = identifier
 
@@ -281,21 +281,21 @@ function-arguments = "(" [ expression *( "," expression ) [ "," ] ] ")"
 
 tuple-expression = "(" [ expression 1*( "," expression ) [ "," ] ] ")"
 
-circuit-expression = identifier "{" circuit-component-initializer
-                                    *( "," circuit-component-initializer )
-                                    [ "," ] "}"
+struct-expression = identifier "{" struct-component-initializer
+                                   *( "," struct-component-initializer )
+                                   [ "," ] "}"
 
-circuit-component-initializer = identifier
-                              / identifier ":" expression
+struct-component-initializer = identifier
+                             / identifier ":" expression
 
 postfix-expression = primary-expression
                    / tuple-component-expression
-                   / circuit-component-expression
+                   / struct-component-expression
                    / operator-call
 
 tuple-component-expression = postfix-expression "." numeral
 
-circuit-component-expression = postfix-expression "." identifier
+struct-component-expression = postfix-expression "." identifier
 
 operator-call = unary-operator-call / binary-operator-call
 
@@ -440,22 +440,22 @@ function-parameters = function-parameter *( "," function-parameter ) [ "," ]
 function-parameter = [ %s"public" / %s"constant" / %s"const" ]
                      identifier ":" type
 
-circuit-declaration = %s"circuit" identifier
-                      "{" circuit-component-declarations "}"
+struct-declaration = %s"struct" identifier
+                     "{" struct-component-declarations "}"
 
-circuit-component-declarations = circuit-component-declaration
-                                 *( "," circuit-component-declaration )
-                                 [ "," ]
+struct-component-declarations = struct-component-declaration
+                                *( "," struct-component-declaration )
+                                [ "," ]
 
-circuit-component-declaration = identifier ":" type
+struct-component-declaration = identifier ":" type
 
 record-declaration = %s"record" identifier
-                     "{" circuit-component-declarations "}"
+                     "{" struct-component-declarations "}"
 
 mapping-declaration = %s"mapping" identifier ":" type "=>" type ";"
 
 declaration = function-declaration
-            / circuit-declaration
+            / struct-declaration
             / record-declaration
             / mapping-declaration
 
