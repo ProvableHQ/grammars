@@ -105,6 +105,7 @@ keyword = %s"address"
         / %s"scalar"
         / %s"string"
         / %s"struct"
+        / %s"transition"
         / %s"u8"
         / %s"u16"
         / %s"u32"
@@ -429,16 +430,20 @@ decrement-statement =
 
 function-declaration = *annotation %s"function" identifier
                        "(" [ function-parameters ] ")" "->" type
-                       block [ finalizer ]
-
-finalizer = %s"finalize" identifier
-            "(" [ function-parameters ] ")" "->" type
-            block
+                       block
 
 function-parameters = function-parameter *( "," function-parameter ) [ "," ]
 
 function-parameter = [ %s"public" / %s"constant" / %s"const" ]
                      identifier ":" type
+
+transition-declaration = *annotation %s"transition" identifier
+                         "(" [ function-parameters ] ")" "->" type
+                         block [ finalizer ]
+
+finalizer = %s"finalize" identifier
+            "(" [ function-parameters ] ")" "->" type
+            block
 
 struct-declaration = %s"struct" identifier
                      "{" struct-component-declarations "}"
@@ -455,6 +460,7 @@ record-declaration = %s"record" identifier
 mapping-declaration = %s"mapping" identifier ":" type "=>" type ";"
 
 declaration = function-declaration
+            / transition-declaration
             / struct-declaration
             / record-declaration
             / mapping-declaration
