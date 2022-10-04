@@ -99,6 +99,7 @@ keyword = %s"address"
         / %s"increment"
         / %s"let"
         / %s"mapping"
+        / %s"program"
         / %s"public"
         / %s"record"
         / %s"return"
@@ -459,13 +460,17 @@ record-declaration = %s"record" identifier
 
 mapping-declaration = %s"mapping" identifier ":" type "=>" type ";"
 
-declaration = function-declaration
-            / transition-declaration
-            / struct-declaration
-            / record-declaration
-            / mapping-declaration
+program-item = function-declaration
+             / transition-declaration
+             / struct-declaration
+             / record-declaration
+             / mapping-declaration
 
-file = *declaration
+program-declaration = %s"program" program-id "{" *program-item "}"
+
+program-id = identifier "." identifier
+
+file = program-declaration
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
