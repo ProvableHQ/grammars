@@ -95,6 +95,7 @@ keyword = %s"address"
         / %s"i64"
         / %s"i128"
         / %s"if"
+        / %s"import"
         / %s"in"
         / %s"increment"
         / %s"let"
@@ -470,7 +471,9 @@ program-declaration = %s"program" program-id "{" *program-item "}"
 
 program-id = identifier "." identifier
 
-file = program-declaration
+import-declaration = %s"import" program-id ";"
+
+file = *import-declaration program-declaration
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
