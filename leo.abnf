@@ -227,6 +227,10 @@ lexeme = token / comment / whitespace
 ; Syntactic Grammar
 ; -----------------
 
+program-id = identifier "." identifier
+
+locator = program-id "/" identifier
+
 unsigned-type = %s"u8" / %s"u16" / %s"u32" / %s"u64" / %s"u128"
 
 signed-type = %s"i8" / %s"i16" / %s"i32" / %s"i64" / %s"i128"
@@ -249,7 +253,9 @@ string-type = %s"string"
 
 primitive-type =  boolean-type / arithmetic-type / address-type / string-type
 
-named-type = primitive-type / identifier
+named-type = primitive-type
+           / identifier [ "." %s"record" ]
+           / locator [ "." %s"record" ]
 
 tuple-type = "(" [ type 1*( "," type ) [ "," ] ] ")"
 
@@ -277,6 +283,7 @@ variable-or-free-constant = identifier
 associated-constant = named-type "::" identifier
 
 free-function-call = identifier function-arguments
+                   / locator function-arguments
 
 static-function-call = named-type "::" identifier function-arguments
 
@@ -468,8 +475,6 @@ program-item = function-declaration
              / mapping-declaration
 
 program-declaration = %s"program" program-id "{" *program-item "}"
-
-program-id = identifier "." identifier
 
 import-declaration = %s"import" program-id ";"
 
