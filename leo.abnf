@@ -71,7 +71,6 @@ not-line-feed-or-carriage-return =
 keyword = %s"address"
         / %s"async"
         / %s"bool"
-        / %s"circuit"
         / %s"console"
         / %s"const"
         / %s"constant"
@@ -88,15 +87,19 @@ keyword = %s"address"
         / %s"i64"
         / %s"i128"
         / %s"if"
+        / %s"import"
         / %s"in"
         / %s"increment"
         / %s"let"
         / %s"mapping"
+        / %s"program"
         / %s"public"
         / %s"record"
         / %s"return"
         / %s"scalar"
         / %s"string"
+        / %s"struct"
+        / %s"transition"
         / %s"u8"
         / %s"u16"
         / %s"u32"
@@ -224,6 +227,10 @@ lexeme = token / comment / whitespace
 ; Syntactic Grammar
 ; -----------------
 
+program-id = identifier "." identifier
+
+locator = program-id "/" identifier
+
 unsigned-type = %s"u8" / %s"u16" / %s"u32" / %s"u64" / %s"u128"
 
 signed-type = %s"i8" / %s"i16" / %s"i32" / %s"i64" / %s"i128"
@@ -246,7 +253,9 @@ string-type = %s"string"
 
 primitive-type =  boolean-type / arithmetic-type / address-type / string-type
 
-named-type = primitive-type / identifier
+named-type = primitive-type
+           / identifier [ "." %s"record" ]
+           / locator [ "." %s"record" ]
 
 tuple-type = "(" [ type 1*( "," type ) [ "," ] ] ")"
 
@@ -267,13 +276,14 @@ primary-expression = literal
                    / free-function-call
                    / static-function-call
                    / tuple-expression
-                   / circuit-expression
+                   / struct-expression
 
 variable-or-free-constant = identifier
 
 associated-constant = named-type "::" identifier
 
 free-function-call = identifier function-arguments
+                   / locator function-arguments
 
 static-function-call = named-type "::" identifier function-arguments
 
@@ -281,21 +291,21 @@ function-arguments = "(" [ expression *( "," expression ) [ "," ] ] ")"
 
 tuple-expression = "(" [ expression 1*( "," expression ) [ "," ] ] ")"
 
-circuit-expression = identifier "{" circuit-component-initializer
-                                    *( "," circuit-component-initializer )
-                                    [ "," ] "}"
+struct-expression = identifier "{" struct-component-initializer
+                                   *( "," struct-component-initializer )
+                                   [ "," ] "}"
 
-circuit-component-initializer = identifier
-                              / identifier ":" expression
+struct-component-initializer = identifier
+                             / identifier ":" expression
 
 postfix-expression = primary-expression
                    / tuple-component-expression
-                   / circuit-component-expression
+                   / struct-component-expression
                    / operator-call
 
 tuple-component-expression = postfix-expression "." numeral
 
-circuit-component-expression = postfix-expression "." identifier
+struct-component-expression = postfix-expression "." identifier
 
 operator-call = unary-operator-call / binary-operator-call
 
@@ -429,37 +439,46 @@ decrement-statement =
 
 function-declaration = *annotation %s"function" identifier
                        "(" [ function-parameters ] ")" "->" type
-                       block [ finalizer ]
-
-finalizer = %s"finalize" identifier
-            "(" [ function-parameters ] ")" "->" type
-            block
+                       block
 
 function-parameters = function-parameter *( "," function-parameter ) [ "," ]
 
 function-parameter = [ %s"public" / %s"constant" / %s"const" ]
                      identifier ":" type
 
-circuit-declaration = %s"circuit" identifier
-                      "{" circuit-component-declarations "}"
+transition-declaration = *annotation %s"transition" identifier
+                         "(" [ function-parameters ] ")" "->" type
+                         block [ finalizer ]
 
-circuit-component-declarations = circuit-component-declaration
-                                 *( "," circuit-component-declaration )
-                                 [ "," ]
+finalizer = %s"finalize" identifier
+            "(" [ function-parameters ] ")" "->" type
+            block
 
-circuit-component-declaration = identifier ":" type
+struct-declaration = %s"struct" identifier
+                     "{" struct-component-declarations "}"
+
+struct-component-declarations = struct-component-declaration
+                                *( "," struct-component-declaration )
+                                [ "," ]
+
+struct-component-declaration = identifier ":" type
 
 record-declaration = %s"record" identifier
-                     "{" circuit-component-declarations "}"
+                     "{" struct-component-declarations "}"
 
 mapping-declaration = %s"mapping" identifier ":" type "=>" type ";"
 
-declaration = function-declaration
-            / circuit-declaration
-            / record-declaration
-            / mapping-declaration
+program-item = function-declaration
+             / transition-declaration
+             / struct-declaration
+             / record-declaration
+             / mapping-declaration
 
-file = *declaration
+program-declaration = %s"program" program-id "{" *program-item "}"
+
+import-declaration = %s"import" program-id ";"
+
+file = *import-declaration program-declaration
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

@@ -272,7 +272,7 @@ mapping-value = cws %s"value" ws identifier ws %s"as" ws finalize-type ws ";"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-interface = cws %s"interface"  ws identifier ws ":" 1*tuple
+struct = cws %s"struct"  ws identifier ws ":" 1*tuple
 
 tuple = cws identifier ws %s"as" ws plaintext-type ws ";"
 
@@ -375,30 +375,30 @@ finalize-command = cws %s"finalize" *( ws operand ) cws ";"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-closure = cws %s"closure" ws identifier ws ":"
-          *closure-input
-          1*instruction
-          *closure-output
+function = cws %s"function" ws identifier ws ":"
+           *function-input
+           1*instruction
+           *function-output
 
-closure-input = cws %s"input" ws register
-                ws %s"as" ws register-type ws ";"
-
-closure-output = cws %s"output" ws register-access
+function-input = cws %s"input" ws register
                  ws %s"as" ws register-type ws ";"
+
+function-output = cws %s"output" ws register-access
+                  ws %s"as" ws register-type ws ";"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-function = cws %s"function" ws identifier ws ":"
-           *function-input
+transition = cws %s"transition" ws identifier ws ":"
+           *transition-input
            *instruction
-           *function-output
+           *transition-output
            cws [ finalize-command finalize ]
 
-function-input = cws %s"input" ws register
-                 ws %s"as" ws value-type ws ";"
+transition-input = cws %s"input" ws register
+                   ws %s"as" ws value-type ws ";"
 
-function-output = cws %s"output" ws register-access
-                  ws %s"as" ws value-type ws ";"
+transition-output = cws %s"output" ws register-access
+                    ws %s"as" ws value-type ws ";"
 
 finalize = cws %s"finalize" ws identifier ws ":"
            *finalize-input
@@ -415,5 +415,5 @@ finalize-output = cws %s"output" ws register-access
 
 program = *import
           cws %s"program" ws program-id ws ";"
-          1*( mapping / interface / record / closure / function )
+          1*( mapping / struct / record / function / transition )
           cws
