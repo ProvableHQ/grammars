@@ -208,7 +208,7 @@ not-dq-or-backslash = ht
                     / %x23-5B
                     / %x5D-7E
                     / safe-nonascii
-                    ; anything but " (%x22) or \ (%x5C)
+                    ; anything but " (%x22) and \ (%x5C)
 
 escaped-char = "\" ( dq
                    / "\"
