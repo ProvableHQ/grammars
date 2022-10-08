@@ -30,7 +30,7 @@
 ; This grammar currently consists of one level,
 ; as opposed to two levels (lexical and syntactic).
 ; While two levels are typical for higher-level languages like Leo,
-; one level are workable for lower-level languages like Aleo instructions.
+; one level is workable for lower-level languages like Aleo instructions.
 ; By not throwing away whitespace and comment
 ; when moving between the two levels,
 ; we can (as the current rules do) enforce requirements
