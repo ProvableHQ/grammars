@@ -19,14 +19,6 @@
 ; Lexical Grammar
 ; ---------------
 
-ascii = %x0-7F
-
-safe-nonascii = %x80-2029 / %x202F-2065 / %x206A-D7FF / %xE000-10FFFF
-                ; excludes bidi embeddings/overrides/isolates
-                ; and excludes high/low surrogates
-
-character = ascii / safe-nonascii
-
 horizontal-tab = %x9   ; <HT>
 
 line-feed = %xA   ; <LF>
@@ -34,6 +26,23 @@ line-feed = %xA   ; <LF>
 carriage-return = %xD   ; <CR>
 
 space = %x20   ; <SP>
+
+visible-ascii = %x21-7E
+
+safe-ascii = horizontal-tab
+           / line-feed
+           / carriage-return
+           / space
+           / visible-ascii
+           ; excludes control characters 0-8, 11, 12, 14-31, 127
+
+safe-nonascii = %x80-2029 / %x202F-2065 / %x206A-D7FF / %xE000-10FFFF
+                ; excludes bidi embeddings/overrides/isolates
+                ; (i.e. %x202A-202E and %x2066-2069)
+                ; and excludes high/low surrogates
+                ; (i.e. %xD800-DFFF )
+
+character = safe-ascii / safe-nonascii
 
 line-terminator = line-feed / carriage-return / carriage-return line-feed
 
@@ -55,18 +64,27 @@ rest-of-block-comment-after-star =
     / line-terminator rest-of-block-comment
 
 not-star-or-line-feed-or-carriage-return =
-    %x0-9 / %xB-C / %xE-29 / %x2B-7F / safe-nonascii
-    ; anything but * or <LF> or <CR>
+      horizontal-tab
+    / %x20-29
+    / %x2B-7E
+    / safe-nonascii
+    ; anything but * (%x2A) and <LF> and <CR>
 
 not-star-or-slash-or-line-feed-or-carriage-return =
-    %x0-9 / %xB-C / %xE-29 / %x2B-2E / %x30-7F / safe-nonascii
-    ; anything but * or / or <LF> or <CR>
+      horizontal-tab
+    / %x20-29
+    / %x2B-2E
+    / %x30-7E
+    / safe-nonascii
+    ; anything but * (%x2A) and / (%x2F) and <LF> and <CR>
 
 line-comment = "//" *not-line-feed-or-carriage-return
 
-not-line-feed-or-carriage-return =
-    %x0-9 / %xB-C / %xE-7F / safe-nonascii
-    ; anything but <LF> or <CR>
+not-line-feed-or-carriage-return = horizontal-tab
+                                 / space
+                                 / visible-ascii
+                                 / safe-nonascii
+                                 ; anything but <LF> and <CR>
 
 keyword = %s"address"
         / %s"async"
@@ -176,8 +194,12 @@ string-literal-element =
     / unicode-character-escape
 
 not-double-quote-or-backslash-or-line-feed-or-carriage-return =
-    %x0-9 / %xB-C / %xE-21 / %x23-5B / %x5D-7F / safe-nonascii
-    ; anything but " or \ or <LF> or <CR>
+      horizontal-tab
+    / %x20-21
+    / %x23-5B
+    / %x5D-7E
+    / safe-nonascii
+    ; anything but " (%x22) and \ (%x5C) and <LF> and <CR>
 
 integer-literal = unsigned-literal
                 / signed-literal
