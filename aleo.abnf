@@ -389,10 +389,10 @@ function-output = cws %s"output" ws register-access
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 transition = cws %s"transition" ws identifier ws ":"
-           *transition-input
-           *instruction
-           *transition-output
-           [ finalize-command finalize ]
+             *transition-input
+             *instruction
+             *transition-output
+             [ finalize-command finalize ]
 
 transition-input = cws %s"input" ws register
                    ws %s"as" ws value-type ws ";"
