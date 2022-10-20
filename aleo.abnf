@@ -369,7 +369,19 @@ increment = cws %s"increment"
             ws identifier "[" ws operand ws "]"
             ws %s"by" ws operand ws ";"
 
-command = decrement / increment / instruction
+load = cws %s"load"
+       ws identifier "[" ws operand ws "]"
+       ws %s"into" ws register ws ";"
+
+store = cws %s"store"
+        ws operand ws
+        %s"into" ws identifier "[" ws operand ws "]" ws ";"
+
+command = decrement
+        / increment
+        / load
+        / store
+        / instruction
 
 finalize-command = cws %s"finalize" *( ws operand ) ws ";"
 
