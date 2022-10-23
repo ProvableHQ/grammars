@@ -137,7 +137,7 @@ hex-digit = digit / "a" / "b" / "c" / "d" / "e" / "f" ; 0-9 A-F a-f
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-identifier = 1*letter *( letter / digit / "_" )
+identifier = letter *( letter / digit / "_" )
 
 program-id = identifier "." identifier
 
