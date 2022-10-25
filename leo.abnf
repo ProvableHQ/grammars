@@ -473,7 +473,8 @@ transition-declaration = *annotation %s"transition" identifier
                          block [ finalizer ]
 
 finalizer = %s"finalize" identifier
-            "(" [ function-parameters ] ")" "->" type
+            "(" [ function-parameters ] ")"
+            [ "->" type ]
             block
 
 struct-declaration = %s"struct" identifier
