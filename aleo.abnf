@@ -70,21 +70,16 @@ dq = %x22 ; "
 
 visible-ascii = %x21-7E
 
-other-ascii = %x0-8 / %xB-C / %xE-1F / %x7F ; we should disallow these
-
-ascii = visible-ascii / ht / sp / lf / cr / other-ascii
+safe-ascii = ht / lf / cr / sp / visible-ascii
+             ; excludes control characters 0-8, 11, 12, 14-31, 127
 
 safe-nonascii = %x80-2029 / %x202F-2065 / %x206A-D7FF / %xE000-10FFFF
                 ; excludes bidi embeddings/overrides/isolates
+                ; (i.e. %x202A-202E and %x2066-2069)
                 ; and excludes high/low surrogates
+                ; (i.e. %xD800-DFFF )
 
-bidi = %x202A-202E / %x2066-2069 ; we should disallow these
-
-surrogate = %xD800-DFFF ; these are disallowed via UTF-8 decoding
-
-nonascii = safe-nonascii / bidi / surrogate
-
-character = ascii / nonascii
+character = safe-ascii / safe-nonascii
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -102,20 +97,37 @@ comment = line-comment / block-comment
 
 line-comment = "//" *( escaped-lf / not-lf-or-cr )
 
-not-lf-or-cr = %x0-9 / %xB-C / %xE-10FFFF ; anything but lf or cr
+not-lf-or-cr = ht
+             / sp
+             / visible-ascii
+             / safe-nonascii
+             ; anything but lf and cr
 
 block-comment = "/*" rest-of-block-comment
 
 rest-of-block-comment = "*" rest-of-block-comment-after-star
                       / not-star rest-of-block-comment
 
-not-star = %x0-29 / %x2B-10FFFF ; anything but *
+not-star = ht
+         / lf
+         / cr
+         / %x20-29
+         / %x2B-7E
+         / safe-nonascii
+         ; anything but * (%x2A)
 
 rest-of-block-comment-after-star = "/"
                                  / "*" rest-of-block-comment-after-star
                                  / not-star-or-slash rest-of-block-comment
 
-not-star-or-slash = %x0-29 / %x2B-2E / %x30-10FFFF ; anything but * or /
+not-star-or-slash = ht
+                  / lf
+                  / cr
+                  / %x20-29
+                  / %x2B-2E
+                  / %x30-7E
+                  / safe-nonascii
+                  ; anything but * (%x2A) and / (%x2F)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -189,7 +201,14 @@ string-element = not-dq-or-backslash
                / escaped-char
                / escaped-ws
 
-not-dq-or-backslash = %x0-21 / %x23-5B / %x5D-10FFFF ; anything but " or \
+not-dq-or-backslash = ht
+                    / lf
+                    / cr
+                    / %x20-21
+                    / %x23-5B
+                    / %x5D-7E
+                    / safe-nonascii
+                    ; anything but " (%x22) and \ (%x5C)
 
 escaped-char = "\" ( dq
                    / "\"
