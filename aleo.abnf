@@ -259,21 +259,21 @@ literal-type = arithmetic-type / address-type / boolean-type / string-type
 
 plaintext-type = literal-type / identifier
 
-value-type = ( plaintext-type %s".constant"
-             / plaintext-type %s".public"
-             / plaintext-type %s".private"
-             / identifier %s".record"
-             / locator %s".record" )
+value-type = plaintext-type %s".constant"
+           / plaintext-type %s".public"
+           / plaintext-type %s".private"
+           / identifier %s".record"
+           / locator %s".record"
 
-finalize-type = ( plaintext-type %s".public"
-                / identifier %s".record"
-                / locator %s".record" )
+finalize-type = plaintext-type %s".public"
+              / identifier %s".record"
+              / locator %s".record"
 
 entry-type = plaintext-type ( %s".constant" / %s".public" / %s".private" )
 
-register-type = ( locator %s".record"
-                / identifier %s".record"
-                / plaintext-type )
+register-type = locator %s".record"
+              / identifier %s".record"
+              / plaintext-type
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
