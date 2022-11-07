@@ -273,15 +273,20 @@ address-type = %s"address"
 
 string-type = %s"string"
 
-primitive-type =  boolean-type / arithmetic-type / address-type / string-type
+named-primitive-type =
+    boolean-type / arithmetic-type / address-type / string-type
 
-named-type = primitive-type
+unit-type = "(" ")"
+
+primitive-type = named-primitive-type / unit-type
+
+named-type = named-primitive-type
            / identifier [ "." %s"record" ]
            / locator [ "." %s"record" ]
 
-tuple-type = "(" [ type 1*( "," type ) [ "," ] ] ")"
+tuple-type = "(" type 1*( "," type ) [ "," ] ")"
 
-type = named-type / tuple-type
+type = named-type / unit-type / tuple-type
 
 group-coordinate = ( [ "-" ] numeral ) / "+" / "-" / "_"
 
@@ -297,6 +302,7 @@ primary-expression = literal
                    / "(" expression ")"
                    / free-function-call
                    / static-function-call
+                   / unit-expression
                    / tuple-expression
                    / struct-expression
 
@@ -310,6 +316,8 @@ free-function-call = identifier function-arguments
 static-function-call = named-type "::" identifier function-arguments
 
 function-arguments = "(" [ expression *( "," expression ) [ "," ] ] ")"
+
+unit-expression = "(" ")"
 
 tuple-expression = "(" [ expression 1*( "," expression ) [ "," ] ] ")"
 
