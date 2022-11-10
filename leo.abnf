@@ -406,7 +406,7 @@ statement = return-statement
 
 block = "{" *statement "}"
 
-return-statement = %s"return" expression ";"
+return-statement = %s"return" [ expression ] ";"
 
 variable-declaration = %s"let" identifier ":" type "=" expression ";"
 
