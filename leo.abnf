@@ -319,7 +319,7 @@ function-arguments = "(" [ expression *( "," expression ) [ "," ] ] ")"
 
 unit-expression = "(" ")"
 
-tuple-expression = "(" [ expression 1*( "," expression ) [ "," ] ] ")"
+tuple-expression = "(" expression 1*( "," expression ) [ "," ] ")"
 
 struct-expression = identifier "{" struct-component-initializer
                                    *( "," struct-component-initializer )
