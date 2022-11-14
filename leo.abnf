@@ -311,7 +311,7 @@ static-function-call = named-type "::" identifier function-arguments
 
 function-arguments = "(" [ expression *( "," expression ) [ "," ] ] ")"
 
-tuple-expression = "(" expression 1*( "," expression ) [ "," ] ")"
+tuple-expression = "(" [ expression 1*( "," expression ) [ "," ] ] ")"
 
 struct-expression = identifier "{" struct-component-initializer
                                    *( "," struct-component-initializer )
