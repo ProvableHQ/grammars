@@ -110,6 +110,7 @@ keyword = %s"address"
         / %s"increment"
         / %s"let"
         / %s"mapping"
+        / %s"private"
         / %s"program"
         / %s"public"
         / %s"record"
@@ -465,17 +466,20 @@ function-declaration = *annotation %s"function" identifier
 
 function-parameters = function-parameter *( "," function-parameter ) [ "," ]
 
-function-parameter = [ %s"public" / %s"constant" / %s"const" ]
+function-parameter = [ %s"public" / %s"private" / %s"constant" / %s"const" ]
                      identifier ":" type
 
-transition-declaration = *annotation %s"transition" identifier
-                         "(" [ function-parameters ] ")" "->" type
-                         block [ finalizer ]
+transition-declaration =
+    *annotation %s"transition" identifier
+    "(" [ function-parameters ] ")"
+    "->" [ %s"public" / %s"private" / %s"constant" / %s"const" ] type
+    block [ finalizer ]
 
-finalizer = %s"finalize" identifier
-            "(" [ function-parameters ] ")"
-            [ "->" type ]
-            block
+finalizer =
+    %s"finalize" identifier
+    "(" [ function-parameters ] ")"
+    [ "->" [ %s"public" / %s"private" / %s"constant" / %s"const" ] type ]
+    block
 
 struct-declaration = %s"struct" identifier
                      "{" struct-component-declarations "}"
