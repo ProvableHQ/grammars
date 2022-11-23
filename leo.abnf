@@ -473,7 +473,8 @@ decrement-statement =
     %s"decrement" "(" identifier "," expression "," expression [ "," ] ")" ";"
 
 function-declaration = *annotation %s"function" identifier
-                       "(" [ function-parameters ] ")" "->" type
+                       "(" [ function-parameters ] ")"
+                       [ "->" type ]
                        block
 
 function-parameters = function-parameter *( "," function-parameter ) [ "," ]
@@ -482,7 +483,8 @@ function-parameter = [ %s"public" / %s"constant" / %s"const" ]
                      identifier ":" type
 
 transition-declaration = *annotation %s"transition" identifier
-                         "(" [ function-parameters ] ")" "->" type
+                         "(" [ function-parameters ] ")"
+                         [ "->" type ]
                          block [ finalizer ]
 
 finalizer = %s"finalize" identifier
