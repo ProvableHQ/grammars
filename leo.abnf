@@ -416,9 +416,14 @@ block = "{" *statement "}"
 
 return-statement = %s"return" expression ";"
 
-variable-declaration = %s"let" identifier ":" type "=" expression ";"
+variable-declaration = %s"let" identifier-or-identifiers ":" type
+                       "=" expression ";"
 
-constant-declaration = %s"const" identifier ":" type "=" expression ";"
+constant-declaration = %s"const" identifier-or-identifiers ":" type
+                       "=" expression ";"
+
+identifier-or-identifiers = identifier
+                          / "(" identifier 1*( "," identifier ) [ "," ] ")"
 
 branch = %s"if" expression block
 
