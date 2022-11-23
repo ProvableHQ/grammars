@@ -274,15 +274,20 @@ address-type = %s"address"
 
 string-type = %s"string"
 
-primitive-type =  boolean-type / arithmetic-type / address-type / string-type
+named-primitive-type =
+    boolean-type / arithmetic-type / address-type / string-type
 
-named-type = primitive-type
+unit-type = "(" ")"
+
+primitive-type = named-primitive-type / unit-type
+
+named-type = named-primitive-type
            / identifier [ "." %s"record" ]
            / locator [ "." %s"record" ]
 
-tuple-type = "(" [ type 1*( "," type ) [ "," ] ] ")"
+tuple-type = "(" type 1*( "," type ) [ "," ] ")"
 
-type = named-type / tuple-type
+type = named-type / unit-type / tuple-type
 
 group-coordinate = ( [ "-" ] numeral ) / "+" / "-" / "_"
 
@@ -298,6 +303,7 @@ primary-expression = literal
                    / "(" expression ")"
                    / free-function-call
                    / static-function-call
+                   / unit-expression
                    / tuple-expression
                    / struct-expression
 
@@ -312,7 +318,9 @@ static-function-call = named-type "::" identifier function-arguments
 
 function-arguments = "(" [ expression *( "," expression ) [ "," ] ] ")"
 
-tuple-expression = "(" [ expression 1*( "," expression ) [ "," ] ] ")"
+unit-expression = "(" ")"
+
+tuple-expression = "(" expression 1*( "," expression ) [ "," ] ")"
 
 struct-expression = identifier "{" struct-component-initializer
                                    *( "," struct-component-initializer )
@@ -409,9 +417,14 @@ block = "{" *statement "}"
 
 return-statement = %s"return" expression ";"
 
-variable-declaration = %s"let" identifier ":" type "=" expression ";"
+variable-declaration = %s"let" identifier-or-identifiers ":" type
+                       "=" expression ";"
 
-constant-declaration = %s"const" identifier ":" type "=" expression ";"
+constant-declaration = %s"const" identifier-or-identifiers ":" type
+                       "=" expression ";"
+
+identifier-or-identifiers = identifier
+                          / "(" identifier 1*( "," identifier ) [ "," ] ")"
 
 branch = %s"if" expression block
 
@@ -461,7 +474,8 @@ decrement-statement =
     %s"decrement" "(" identifier "," expression "," expression [ "," ] ")" ";"
 
 function-declaration = *annotation %s"function" identifier
-                       "(" [ function-parameters ] ")" "->" type
+                       "(" [ function-parameters ] ")"
+                       [ "->" type ]
                        block
 
 function-parameters = function-parameter *( "," function-parameter ) [ "," ]
