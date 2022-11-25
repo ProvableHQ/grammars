@@ -415,7 +415,7 @@ statement = return-statement
 
 block = "{" *statement "}"
 
-return-statement = %s"return" expression ";"
+return-statement = %s"return" [ expression ] ";"
 
 expression-statement = expression ";"
 
