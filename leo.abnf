@@ -87,7 +87,6 @@ not-line-feed-or-carriage-return = horizontal-tab
                                  ; anything but <LF> and <CR>
 
 keyword = %s"address"
-        / %s"async"
         / %s"bool"
         / %s"console"
         / %s"const"
@@ -118,6 +117,7 @@ keyword = %s"address"
         / %s"scalar"
         / %s"string"
         / %s"struct"
+        / %s"then"
         / %s"transition"
         / %s"u8"
         / %s"u16"
@@ -409,14 +409,14 @@ statement = return-statement
           / loop-statement
           / assignment-statement
           / console-statement
-          / finalize-statement
           / increment-statement
           / decrement-statement
           / block
 
 block = "{" *statement "}"
 
-return-statement = %s"return" [ expression ] ";"
+return-statement =
+    %s"return" [ expression ] [ %s"then" %s"finalize" function-arguments ] ";"
 
 expression-statement = expression ";"
 
@@ -467,8 +467,6 @@ assert-call = %s"assert" "(" expression ")"
 assert-equal-call = %s"assert_eq" "(" expression "," expression [ "," ] ")"
 
 assert-not-equal-call = %s"assert_neq" "(" expression "," expression [ "," ] ")"
-
-finalize-statement = %s"async" %s"finalize" function-arguments ";"
 
 increment-statement =
     %s"increment" "(" identifier "," expression "," expression [ "," ] ")" ";"
