@@ -401,6 +401,7 @@ conditional-ternary-expression = binary-expression
 expression = conditional-ternary-expression
 
 statement = return-statement
+          / expression-statement
           / variable-declaration
           / constant-declaration
           / conditional-statement
@@ -415,6 +416,8 @@ statement = return-statement
 block = "{" *statement "}"
 
 return-statement = %s"return" expression ";"
+
+expression-statement = expression ";"
 
 variable-declaration = %s"let" identifier-or-identifiers ":" type
                        "=" expression ";"
