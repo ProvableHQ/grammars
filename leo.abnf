@@ -487,7 +487,7 @@ function-parameter = [ %s"public" / %s"private" / %s"constant" / %s"const" ]
 transition-declaration =
     *annotation %s"transition" identifier
     "(" [ function-parameters ] ")"
-    "->" [ %s"public" / %s"private" / %s"constant" / %s"const" ] type
+    [ "->" [ %s"public" / %s"private" / %s"constant" / %s"const" ] type ]
     block [ finalizer ]
 
 finalizer =
