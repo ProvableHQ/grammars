@@ -16,6 +16,17 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; This file specifies the grammar of Leo in the ABNF notation,
+; which is defined in:
+; - RFC 5234 (https://www.rfc-editor.org/rfc/rfc5234)
+; - RFC 7405 (https://www.rfc-editor.org/rfc/rfc7405)
+
+; Leo files are written in Unicode, encoded in UTF-8.
+; The grammar in this file applies to the Unicode scalar values
+; that result from the UTF-8 decoding of the files.
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ; Lexical Grammar
 ; ---------------
 
