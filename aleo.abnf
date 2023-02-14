@@ -402,7 +402,7 @@ function = cws %s"function" ws identifier ws ":"
 function-input = cws %s"input" ws register
                  ws %s"as" ws register-type ws ";"
 
-function-output = cws %s"output" ws register-access
+function-output = cws %s"output" ws operand
                   ws %s"as" ws register-type ws ";"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -416,7 +416,7 @@ transition = cws %s"transition" ws identifier ws ":"
 transition-input = cws %s"input" ws register
                    ws %s"as" ws value-type ws ";"
 
-transition-output = cws %s"output" ws register-access
+transition-output = cws %s"output" ws operand
                     ws %s"as" ws value-type ws ";"
 
 finalize = cws %s"finalize" ws identifier ws ":"
@@ -427,7 +427,7 @@ finalize = cws %s"finalize" ws identifier ws ":"
 finalize-input = cws %s"input" ws register
                  ws %s"as" ws finalize-type ws ";"
 
-finalize-output = cws %s"output" ws register-access
+finalize-output = cws %s"output" ws operand
                   ws %s"as" ws finalize-type ws ";"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
