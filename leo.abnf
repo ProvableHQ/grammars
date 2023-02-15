@@ -19,14 +19,6 @@
 ; Lexical Grammar
 ; ---------------
 
-ascii = %x0-7F
-
-safe-nonascii = %x80-2029 / %x202F-2065 / %x206A-D7FF / %xE000-10FFFF
-                ; excludes bidi embeddings/overrides/isolates
-                ; and excludes high/low surrogates
-
-character = ascii / safe-nonascii
-
 horizontal-tab = %x9   ; <HT>
 
 line-feed = %xA   ; <LF>
@@ -34,6 +26,23 @@ line-feed = %xA   ; <LF>
 carriage-return = %xD   ; <CR>
 
 space = %x20   ; <SP>
+
+visible-ascii = %x21-7E
+
+safe-ascii = horizontal-tab
+           / line-feed
+           / carriage-return
+           / space
+           / visible-ascii
+           ; excludes control characters 0-8, 11, 12, 14-31, 127
+
+safe-nonascii = %x80-2029 / %x202F-2065 / %x206A-D7FF / %xE000-10FFFF
+                ; excludes bidi embeddings/overrides/isolates
+                ; (i.e. %x202A-202E and %x2066-2069)
+                ; and excludes high/low surrogates
+                ; (i.e. %xD800-DFFF )
+
+character = safe-ascii / safe-nonascii
 
 line-terminator = line-feed / carriage-return / carriage-return line-feed
 
@@ -55,21 +64,29 @@ rest-of-block-comment-after-star =
     / line-terminator rest-of-block-comment
 
 not-star-or-line-feed-or-carriage-return =
-    %x0-9 / %xB-C / %xE-29 / %x2B-7F / safe-nonascii
-    ; anything but * or <LF> or <CR>
+      horizontal-tab
+    / %x20-29
+    / %x2B-7E
+    / safe-nonascii
+    ; anything but * (%x2A) and <LF> and <CR>
 
 not-star-or-slash-or-line-feed-or-carriage-return =
-    %x0-9 / %xB-C / %xE-29 / %x2B-2E / %x30-7F / safe-nonascii
-    ; anything but * or / or <LF> or <CR>
+      horizontal-tab
+    / %x20-29
+    / %x2B-2E
+    / %x30-7E
+    / safe-nonascii
+    ; anything but * (%x2A) and / (%x2F) and <LF> and <CR>
 
 line-comment = "//" *not-line-feed-or-carriage-return
 
-not-line-feed-or-carriage-return =
-    %x0-9 / %xB-C / %xE-7F / safe-nonascii
-    ; anything but <LF> or <CR>
+not-line-feed-or-carriage-return = horizontal-tab
+                                 / space
+                                 / visible-ascii
+                                 / safe-nonascii
+                                 ; anything but <LF> and <CR>
 
 keyword = %s"address"
-        / %s"async"
         / %s"bool"
         / %s"console"
         / %s"const"
@@ -93,6 +110,7 @@ keyword = %s"address"
         / %s"increment"
         / %s"let"
         / %s"mapping"
+        / %s"private"
         / %s"program"
         / %s"public"
         / %s"record"
@@ -100,6 +118,7 @@ keyword = %s"address"
         / %s"scalar"
         / %s"string"
         / %s"struct"
+        / %s"then"
         / %s"transition"
         / %s"u8"
         / %s"u16"
@@ -177,8 +196,12 @@ string-literal-element =
     / unicode-character-escape
 
 not-double-quote-or-backslash-or-line-feed-or-carriage-return =
-    %x0-9 / %xB-C / %xE-21 / %x23-5B / %x5D-7F / safe-nonascii
-    ; anything but " or \ or <LF> or <CR>
+      horizontal-tab
+    / %x20-21
+    / %x23-5B
+    / %x5D-7E
+    / safe-nonascii
+    ; anything but " (%x22) and \ (%x5C) and <LF> and <CR>
 
 integer-literal = unsigned-literal
                 / signed-literal
@@ -252,15 +275,20 @@ address-type = %s"address"
 
 string-type = %s"string"
 
-primitive-type =  boolean-type / arithmetic-type / address-type / string-type
+named-primitive-type =
+    boolean-type / arithmetic-type / address-type / string-type
 
-named-type = primitive-type
+unit-type = "(" ")"
+
+primitive-type = named-primitive-type / unit-type
+
+named-type = named-primitive-type
            / identifier [ "." %s"record" ]
            / locator [ "." %s"record" ]
 
-tuple-type = "(" [ type 1*( "," type ) [ "," ] ] ")"
+tuple-type = "(" type 1*( "," type ) [ "," ] ")"
 
-type = named-type / tuple-type
+type = named-type / unit-type / tuple-type
 
 group-coordinate = ( [ "-" ] numeral ) / "+" / "-" / "_"
 
@@ -276,6 +304,7 @@ primary-expression = literal
                    / "(" expression ")"
                    / free-function-call
                    / static-function-call
+                   / unit-expression
                    / tuple-expression
                    / struct-expression
 
@@ -290,7 +319,9 @@ static-function-call = named-type "::" identifier function-arguments
 
 function-arguments = "(" [ expression *( "," expression ) [ "," ] ] ")"
 
-tuple-expression = "(" [ expression 1*( "," expression ) [ "," ] ] ")"
+unit-expression = "(" ")"
+
+tuple-expression = "(" expression 1*( "," expression ) [ "," ] ")"
 
 struct-expression = identifier "{" struct-component-initializer
                                    *( "," struct-component-initializer )
@@ -372,24 +403,32 @@ conditional-ternary-expression = binary-expression
 expression = conditional-ternary-expression
 
 statement = return-statement
+          / expression-statement
           / variable-declaration
           / constant-declaration
           / conditional-statement
           / loop-statement
           / assignment-statement
           / console-statement
-          / finalize-statement
           / increment-statement
           / decrement-statement
           / block
 
 block = "{" *statement "}"
 
-return-statement = %s"return" expression ";"
+return-statement =
+    %s"return" [ expression ] [ %s"then" %s"finalize" function-arguments ] ";"
 
-variable-declaration = %s"let" identifier ":" type "=" expression ";"
+expression-statement = expression ";"
 
-constant-declaration = %s"const" identifier ":" type "=" expression ";"
+variable-declaration = %s"let" identifier-or-identifiers ":" type
+                       "=" expression ";"
+
+constant-declaration = %s"const" identifier-or-identifiers ":" type
+                       "=" expression ";"
+
+identifier-or-identifiers = identifier
+                          / "(" identifier 1*( "," identifier ) [ "," ] ")"
 
 branch = %s"if" expression block
 
@@ -430,8 +469,6 @@ assert-equal-call = %s"assert_eq" "(" expression "," expression [ "," ] ")"
 
 assert-not-equal-call = %s"assert_neq" "(" expression "," expression [ "," ] ")"
 
-finalize-statement = %s"async" %s"finalize" function-arguments ";"
-
 increment-statement =
     %s"increment" "(" identifier "," expression "," expression [ "," ] ")" ";"
 
@@ -439,25 +476,30 @@ decrement-statement =
     %s"decrement" "(" identifier "," expression "," expression [ "," ] ")" ";"
 
 function-declaration = *annotation %s"function" identifier
-                       "(" [ function-parameters ] ")" "->" type
+                       "(" [ function-parameters ] ")"
+                       [ "->" type ]
                        block
 
 function-parameters = function-parameter *( "," function-parameter ) [ "," ]
 
-function-parameter = [ %s"public" / %s"constant" / %s"const" ]
+function-parameter = [ %s"public" / %s"private" / %s"constant" / %s"const" ]
                      identifier ":" type
 
 inline-declaration = *annotation %s"inline" identifier
                      "(" [ function-parameters ] ")" "->" type
                      block
 
-transition-declaration = *annotation %s"transition" identifier
-                         "(" [ function-parameters ] ")" "->" type
-                         block [ finalizer ]
+transition-declaration =
+    *annotation %s"transition" identifier
+    "(" [ function-parameters ] ")"
+    [ "->" [ %s"public" / %s"private" / %s"constant" / %s"const" ] type ]
+    block [ finalizer ]
 
-finalizer = %s"finalize" identifier
-            "(" [ function-parameters ] ")" "->" type
-            block
+finalizer =
+    %s"finalize" identifier
+    "(" [ function-parameters ] ")"
+    [ "->" [ %s"public" / %s"private" / %s"constant" / %s"const" ] type ]
+    block
 
 struct-declaration = %s"struct" identifier
                      "{" struct-component-declarations "}"
