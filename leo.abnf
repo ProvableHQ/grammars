@@ -519,7 +519,8 @@ struct-component-declarations = struct-component-declaration
                                 *( "," struct-component-declaration )
                                 [ "," ]
 
-struct-component-declaration = identifier ":" type
+struct-component-declaration =
+    [ %s"public" / %s"private" / %s"constant" ] identifier ":" type
 
 record-declaration = %s"record" identifier
                      "{" struct-component-declarations "}"
