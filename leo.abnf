@@ -106,6 +106,7 @@ keyword = %s"address"
         / %s"if"
         / %s"import"
         / %s"in"
+        / %s"inline"
         / %s"increment"
         / %s"let"
         / %s"mapping"
@@ -484,6 +485,10 @@ function-parameters = function-parameter *( "," function-parameter ) [ "," ]
 function-parameter = [ %s"public" / %s"private" / %s"constant" / %s"const" ]
                      identifier ":" type
 
+inline-declaration = *annotation %s"inline" identifier
+                     "(" [ function-parameters ] ")" "->" type
+                     block
+
 transition-declaration =
     *annotation %s"transition" identifier
     "(" [ function-parameters ] ")"
@@ -511,6 +516,7 @@ record-declaration = %s"record" identifier
 mapping-declaration = %s"mapping" identifier ":" type "=>" type ";"
 
 program-item = function-declaration
+             / inline-declaration
              / transition-declaration
              / struct-declaration
              / record-declaration
