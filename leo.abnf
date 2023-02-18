@@ -541,23 +541,6 @@ file = *import-declaration program-declaration
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; Input Grammar
-; -------------
-
-input-type = type
-
-input-expression = expression
-
-input-item = identifier ":" input-type "=" input-expression ";"
-
-input-title = "[" ( %s"public" / %s"private" / %s"constant" / %s"const" ) "]"
-
-input-section = input-title *input-item
-
-input-file = *input-section
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 ; Output Grammar
 ; --------------
 
