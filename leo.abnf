@@ -493,7 +493,7 @@ function-declaration = *annotation %s"function" identifier
 
 function-parameters = function-parameter *( "," function-parameter ) [ "," ]
 
-function-parameter = [ %s"public" / %s"private" / %s"constant" / %s"const" ]
+function-parameter = [ %s"public" / %s"private" / %s"constant" ]
                      identifier ":" type
 
 inline-declaration = *annotation %s"inline" identifier
@@ -503,13 +503,13 @@ inline-declaration = *annotation %s"inline" identifier
 transition-declaration =
     *annotation %s"transition" identifier
     "(" [ function-parameters ] ")"
-    [ "->" [ %s"public" / %s"private" / %s"constant" / %s"const" ] type ]
+    [ "->" [ %s"public" / %s"private" / %s"constant" ] type ]
     block [ finalizer ]
 
 finalizer =
     %s"finalize" identifier
     "(" [ function-parameters ] ")"
-    [ "->" [ %s"public" / %s"private" / %s"constant" / %s"const" ] type ]
+    [ "->" [ %s"public" / %s"private" / %s"constant" ] type ]
     block
 
 struct-declaration = %s"struct" identifier
@@ -550,7 +550,7 @@ input-expression = expression
 
 input-item = identifier ":" input-type "=" input-expression ";"
 
-input-title = "[" ( %s"public" / %s"private" / %s"constant" / %s"const" ) "]"
+input-title = "[" ( %s"public" / %s"private" / %s"constant" ) "]"
 
 input-section = input-title *input-item
 
