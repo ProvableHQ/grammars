@@ -100,7 +100,6 @@ not-line-feed-or-carriage-return = horizontal-tab
 keyword = %s"address"
         / %s"bool"
         / %s"console"
-        / %s"const"
         / %s"constant"
         / %s"decrement"
         / %s"else"
@@ -310,7 +309,7 @@ literal = atomic-literal / affine-group-literal
 group-literal = product-group-literal / affine-group-literal
 
 primary-expression = literal
-                   / variable-or-free-constant
+                   / variable
                    / associated-constant
                    / "(" expression ")"
                    / free-function-call
@@ -319,7 +318,7 @@ primary-expression = literal
                    / tuple-expression
                    / struct-expression
 
-variable-or-free-constant = identifier
+variable = identifier
 
 associated-constant = named-type "::" identifier
 
@@ -416,7 +415,6 @@ expression = conditional-ternary-expression
 statement = return-statement
           / expression-statement
           / variable-declaration
-          / constant-declaration
           / conditional-statement
           / loop-statement
           / assignment-statement
@@ -433,9 +431,6 @@ return-statement =
 expression-statement = expression ";"
 
 variable-declaration = %s"let" identifier-or-identifiers ":" type
-                       "=" expression ";"
-
-constant-declaration = %s"const" identifier-or-identifiers ":" type
                        "=" expression ";"
 
 identifier-or-identifiers = identifier
