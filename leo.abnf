@@ -100,7 +100,6 @@ not-line-feed-or-carriage-return = horizontal-tab
 keyword = %s"address"
         / %s"bool"
         / %s"console"
-        / %s"const"
         / %s"constant"
         / %s"decrement"
         / %s"else"
@@ -310,7 +309,7 @@ literal = atomic-literal / affine-group-literal
 group-literal = product-group-literal / affine-group-literal
 
 primary-expression = literal
-                   / variable-or-free-constant
+                   / variable
                    / associated-constant
                    / "(" expression ")"
                    / free-function-call
@@ -319,7 +318,7 @@ primary-expression = literal
                    / tuple-expression
                    / struct-expression
 
-variable-or-free-constant = identifier
+variable = identifier
 
 associated-constant = named-type "::" identifier
 
@@ -416,7 +415,6 @@ expression = conditional-ternary-expression
 statement = return-statement
           / expression-statement
           / variable-declaration
-          / constant-declaration
           / conditional-statement
           / loop-statement
           / assignment-statement
@@ -433,9 +431,6 @@ return-statement =
 expression-statement = expression ";"
 
 variable-declaration = %s"let" identifier-or-identifiers ":" type
-                       "=" expression ";"
-
-constant-declaration = %s"const" identifier-or-identifiers ":" type
                        "=" expression ";"
 
 identifier-or-identifiers = identifier
@@ -493,7 +488,7 @@ function-declaration = *annotation %s"function" identifier
 
 function-parameters = function-parameter *( "," function-parameter ) [ "," ]
 
-function-parameter = [ %s"public" / %s"private" / %s"constant" / %s"const" ]
+function-parameter = [ %s"public" / %s"private" / %s"constant" ]
                      identifier ":" type
 
 inline-declaration = *annotation %s"inline" identifier
@@ -503,13 +498,13 @@ inline-declaration = *annotation %s"inline" identifier
 transition-declaration =
     *annotation %s"transition" identifier
     "(" [ function-parameters ] ")"
-    [ "->" [ %s"public" / %s"private" / %s"constant" / %s"const" ] type ]
+    [ "->" [ %s"public" / %s"private" / %s"constant" ] type ]
     block [ finalizer ]
 
 finalizer =
     %s"finalize" identifier
     "(" [ function-parameters ] ")"
-    [ "->" [ %s"public" / %s"private" / %s"constant" / %s"const" ] type ]
+    [ "->" [ %s"public" / %s"private" / %s"constant" ] type ]
     block
 
 struct-declaration = %s"struct" identifier
@@ -550,7 +545,7 @@ input-expression = expression
 
 input-item = identifier ":" input-type "=" input-expression ";"
 
-input-title = "[" ( %s"public" / %s"private" / %s"constant" / %s"const" ) "]"
+input-title = "[" ( %s"public" / %s"private" / %s"constant" ) "]"
 
 input-section = input-title *input-item
 
