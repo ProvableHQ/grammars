@@ -492,7 +492,8 @@ function-parameter = [ %s"public" / %s"private" / %s"constant" ]
                      identifier ":" type
 
 inline-declaration = *annotation %s"inline" identifier
-                     "(" [ function-parameters ] ")" "->" type
+                     "(" [ function-parameters ] ")"
+                     [ "->" type ]
                      block
 
 transition-declaration =
