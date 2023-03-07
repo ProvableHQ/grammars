@@ -98,6 +98,9 @@ not-line-feed-or-carriage-return = horizontal-tab
                                  ; anything but <LF> and <CR>
 
 keyword = %s"address"
+        / %s"assert"
+        / %s"assert_eq"
+        / %s"assert_neq"
         / %s"bool"
         / %s"console"
         / %s"constant"
