@@ -75,7 +75,7 @@ cr = %xD ; carriage return
 
 sp = %x20 ; space
 
-dq = %x22 ; "
+dq = %x22 ; " (double quote)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -302,7 +302,7 @@ mapping-value = cws %s"value" ws identifier ws %s"as" ws finalize-type ws ";"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-struct = cws %s"struct"  ws identifier ws ":" 1*tuple
+struct = cws %s"struct" ws identifier ws ":" 1*tuple
 
 tuple = cws identifier ws %s"as" ws plaintext-type ws ";"
 
