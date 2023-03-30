@@ -405,30 +405,30 @@ finalize-command = cws %s"finalize" *( ws operand ) ws ";"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-function = cws %s"function" ws identifier ws ":"
-           *function-input
-           1*instruction
-           *function-output
+closure = cws %s"closure" ws identifier ws ":"
+          *closure-input
+          1*instruction
+          *closure-output
 
-function-input = cws %s"input" ws register
+closure-input = cws %s"input" ws register
+                ws %s"as" ws register-type ws ";"
+
+closure-output = cws %s"output" ws register-access
                  ws %s"as" ws register-type ws ";"
-
-function-output = cws %s"output" ws register-access
-                  ws %s"as" ws register-type ws ";"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-transition = cws %s"transition" ws identifier ws ":"
-             *transition-input
-             *instruction
-             *transition-output
-             [ finalize-command finalize ]
+function = cws %s"function" ws identifier ws ":"
+           *function-input
+           *instruction
+           *function-output
+           [ finalize-command finalize ]
 
-transition-input = cws %s"input" ws register
-                   ws %s"as" ws value-type ws ";"
+function-input = cws %s"input" ws register
+                 ws %s"as" ws value-type ws ";"
 
-transition-output = cws %s"output" ws register-access
-                    ws %s"as" ws value-type ws ";"
+function-output = cws %s"output" ws register-access
+                  ws %s"as" ws value-type ws ";"
 
 finalize = cws %s"finalize" ws identifier ws ":"
            *finalize-input
@@ -445,5 +445,5 @@ finalize-output = cws %s"output" ws register-access
 
 program = *import
           cws %s"program" ws program-id ws ";"
-          1*( mapping / struct / record / function / transition )
+          1*( mapping / struct / record / closure / function )
           cws
