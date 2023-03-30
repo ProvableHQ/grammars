@@ -374,7 +374,7 @@ hash = hash-op ws operand ws %s"into" ws register
 cast = %s"cast" 1*( ws operand )
        ws %s"into" ws register ws %s"as" ws register-type
 
-call = %s"call" ws ( locator / identifier ) ws 1*( ws operand )
+call = %s"call" ws ( locator / identifier ) ws *( ws operand )
        ws %s"into" ws 1*( ws register )
 
 instruction = cws
