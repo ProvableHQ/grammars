@@ -1,4 +1,4 @@
-; Copyright (C) 2019-2022 Aleo Systems Inc.
+; Copyright (C) 2019-2023 Aleo Systems Inc.
 ; This file is part of the Aleo library.
 
 ; The Leo library is free software: you can redistribute it and/or modify
@@ -98,10 +98,13 @@ not-line-feed-or-carriage-return = horizontal-tab
                                  ; anything but <LF> and <CR>
 
 keyword = %s"address"
+        / %s"as"
+        / %s"asm"
         / %s"assert"
         / %s"assert_eq"
         / %s"assert_neq"
         / %s"bool"
+        / %s"by"
         / %s"console"
         / %s"constant"
         / %s"decrement"
@@ -119,8 +122,9 @@ keyword = %s"address"
         / %s"if"
         / %s"import"
         / %s"in"
-        / %s"inline"
         / %s"increment"
+        / %s"inline"
+        / %s"into"
         / %s"let"
         / %s"mapping"
         / %s"private"
@@ -129,6 +133,7 @@ keyword = %s"address"
         / %s"record"
         / %s"return"
         / %s"scalar"
+        / %s"self"
         / %s"string"
         / %s"struct"
         / %s"then"
@@ -425,6 +430,7 @@ statement = return-statement
           / increment-statement
           / decrement-statement
           / block
+          / assembly
 
 block = "{" *statement "}"
 
@@ -483,6 +489,28 @@ increment-statement =
 
 decrement-statement =
     %s"decrement" "(" identifier "," expression "," expression [ "," ] ")" ";"
+
+assembly = %s"asm" "{" *instruction "}"
+
+instruction-operand = [ "-" ] numeric-literal
+                    / boolean-literal
+                    / address-literal
+                    / string-literal
+                    / identifier *( "." identifier )
+                    / %s"self" "." %s"caller"
+
+unary-instruction = identifier instruction-operand %s"into" identifier ";"
+
+binary-instruction = identifier 2instruction-operand %s"into" identifier ";"
+
+ternary-instruction = identifier 3instruction-operand %s"into" identifier ";"
+
+assert-instruction = %s"assert" 2instruction-operand ";"
+
+instruction = unary-instruction
+            / binary-instruction
+            / ternary-instruction
+            / assert-instruction
 
 function-declaration = *annotation %s"function" identifier
                        "(" [ function-parameters ] ")"
