@@ -75,7 +75,7 @@ cr = %xD ; carriage return
 
 sp = %x20 ; space
 
-dq = %x22 ; "
+dq = %x22 ; " (double quote)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -94,13 +94,11 @@ character = safe-ascii / safe-nonascii
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-escaped-lf = "\" lf ; escaped line feed -- we should disallow this
+escaped-lf = "\" lf ; escaped line feed
 
 plain-ws = ht / sp / lf / cr ; plain (i.e. without escaped-lf) whitespace
 
 ws = *( 1*plain-ws / escaped-lf ) ; whitespace
-
-; we should add and use an explicit notion of line terminator
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -142,7 +140,7 @@ not-star-or-slash = ht
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-cws = ws *( comment / ws ) ; comments and/or whitespace -- optimize this rule
+cws = ws *( comment / ws ) ; comments and/or whitespace
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -176,7 +174,7 @@ register-access = register *( "." identifier )
 
 signed-literal = [ "-" ] 1*( digit *"_" ) signed-type
 
-unsigned-literal = [ "-" ] 1*( digit *"_" ) unsigned-type ; remove [ "-" ]
+unsigned-literal = [ "-" ] 1*( digit *"_" ) unsigned-type
 
 integer-literal = signed-literal / unsigned-literal
 
@@ -231,7 +229,7 @@ escaped-char = "\" ( dq
                    / %s"f"
                    / %s"u" "{" 1*6hex-digit "}" )
 
-escaped-ws = "\" 1*plain-ws ; should the ws here start with a line terminator?
+escaped-ws = "\" 1*plain-ws
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -302,7 +300,7 @@ mapping-value = cws %s"value" ws identifier ws %s"as" ws finalize-type ws ";"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-struct = cws %s"struct"  ws identifier ws ":" 1*tuple
+struct = cws %s"struct" ws identifier ws ":" 1*tuple
 
 tuple = cws identifier ws %s"as" ws plaintext-type ws ";"
 
