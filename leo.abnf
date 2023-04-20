@@ -1,4 +1,4 @@
-; Copyright (C) 2019-2022 Aleo Systems Inc.
+; Copyright (C) 2019-2023 Aleo Systems Inc.
 ; This file is part of the Aleo library.
 
 ; The Leo library is free software: you can redistribute it and/or modify
@@ -129,7 +129,6 @@ keyword = %s"address"
         / %s"record"
         / %s"return"
         / %s"scalar"
-        / %s"string"
         / %s"struct"
         / %s"then"
         / %s"transition"
@@ -146,10 +145,6 @@ lowercase-letter = %x61-7A   ; a-z
 letter = uppercase-letter / lowercase-letter
 
 decimal-digit = %x30-39   ; 0-9
-
-octal-digit = %x30-37   ; 0-7
-
-hexadecimal-digit = decimal-digit / "a" / "b" / "c" / "d" / "e" / "f"
 
 identifier = letter *( letter / decimal-digit / "_" )
              ; but not a keyword or a boolean literal or aleo1...
@@ -170,52 +165,6 @@ boolean-literal = %s"true" / %s"false"
 
 address-literal = %s"aleo1" 58( lowercase-letter / decimal-digit )
 
-single-quote = %x27   ; '
-
-double-quote = %x22   ; "
-
-single-quote-escape = "\" single-quote   ; \'
-
-double-quote-escape = "\" double-quote   ; \"
-
-backslash-escape = "\\"
-
-line-feed-escape = %s"\n"
-
-carriage-return-escape = %s"\r"
-
-horizontal-tab-escape = %s"\t"
-
-null-character-escape = "\0"
-
-simple-character-escape = single-quote-escape
-                        / double-quote-escape
-                        / backslash-escape
-                        / line-feed-escape
-                        / carriage-return-escape
-                        / horizontal-tab-escape
-                        / null-character-escape
-
-ascii-character-escape = %s"\x" octal-digit hexadecimal-digit
-
-unicode-character-escape = %s"\u{" 1*6hexadecimal-digit "}"
-
-string-literal = double-quote *string-literal-element double-quote
-
-string-literal-element =
-      not-double-quote-or-backslash-or-line-feed-or-carriage-return
-    / simple-character-escape
-    / ascii-character-escape
-    / unicode-character-escape
-
-not-double-quote-or-backslash-or-line-feed-or-carriage-return =
-      horizontal-tab
-    / %x20-21
-    / %x23-5B
-    / %x5D-7E
-    / safe-nonascii
-    ; anything but " (%x22) and \ (%x5C) and <LF> and <CR>
-
 integer-literal = unsigned-literal
                 / signed-literal
 
@@ -227,7 +176,6 @@ numeric-literal = integer-literal
 atomic-literal = numeric-literal
                / boolean-literal
                / address-literal
-               / string-literal
 
 annotation = "@" identifier
 
@@ -286,10 +234,8 @@ boolean-type = %s"bool"
 
 address-type = %s"address"
 
-string-type = %s"string"
-
 named-primitive-type =
-    boolean-type / arithmetic-type / address-type / string-type
+    boolean-type / arithmetic-type / address-type
 
 unit-type = "(" ")"
 
