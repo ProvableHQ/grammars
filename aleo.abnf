@@ -75,8 +75,6 @@ cr = %xD ; carriage return
 
 sp = %x20 ; space
 
-dq = %x22 ; " (double quote)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 visible-ascii = %x21-7E
@@ -154,8 +152,6 @@ letter = uppercase-letter / lowercase-letter
 
 digit = %x30-39 ; 0-9
 
-hex-digit = digit / "a" / "b" / "c" / "d" / "e" / "f" ; 0-9 A-F a-f
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 identifier = letter *( letter / digit / "_" )
@@ -204,39 +200,9 @@ boolean-literal = %s"true" / %s"false"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-string-literal = dq *string-element dq
-
-string-element = not-dq-or-backslash
-               / escaped-char
-               / escaped-ws
-
-not-dq-or-backslash = ht
-                    / lf
-                    / cr
-                    / %x20-21
-                    / %x23-5B
-                    / %x5D-7E
-                    / safe-nonascii
-                    ; anything but " (%x22) and \ (%x5C)
-
-escaped-char = "\" ( dq
-                   / "\"
-                   / "/"
-                   / %s"n"
-                   / %s"r"
-                   / %s"t"
-                   / %s"b"
-                   / %s"f"
-                   / %s"u" "{" 1*6hex-digit "}" )
-
-escaped-ws = "\" 1*plain-ws
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 literal = arithmetic-literal
         / address-literal
         / boolean-literal
-        / string-literal
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
