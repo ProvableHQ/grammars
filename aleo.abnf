@@ -394,7 +394,7 @@ closure = cws %s"closure" ws identifier ws ":"
 closure-input = cws %s"input" ws register
                 ws %s"as" ws register-type ws ";"
 
-closure-output = cws %s"output" ws register-access
+closure-output = cws %s"output" ws operand
                  ws %s"as" ws register-type ws ";"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -408,7 +408,7 @@ function = cws %s"function" ws identifier ws ":"
 function-input = cws %s"input" ws register
                  ws %s"as" ws value-type ws ";"
 
-function-output = cws %s"output" ws register-access
+function-output = cws %s"output" ws operand
                   ws %s"as" ws value-type ws ";"
 
 finalize = cws %s"finalize" ws identifier ws ":"
@@ -419,7 +419,7 @@ finalize = cws %s"finalize" ws identifier ws ":"
 finalize-input = cws %s"input" ws register
                  ws %s"as" ws finalize-type ws ";"
 
-finalize-output = cws %s"output" ws register-access
+finalize-output = cws %s"output" ws operand
                   ws %s"as" ws finalize-type ws ";"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
