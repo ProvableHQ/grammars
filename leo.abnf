@@ -16,6 +16,17 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; This file specifies the grammar of Leo in the ABNF notation,
+; which is defined in:
+; - RFC 5234 (https://www.rfc-editor.org/rfc/rfc5234)
+; - RFC 7405 (https://www.rfc-editor.org/rfc/rfc7405)
+
+; Leo files are written in Unicode, encoded in UTF-8.
+; The grammar in this file applies to the Unicode scalar values
+; that result from the UTF-8 decoding of the files.
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ; Lexical Grammar
 ; ---------------
 
@@ -87,9 +98,11 @@ not-line-feed-or-carriage-return = horizontal-tab
                                  ; anything but <LF> and <CR>
 
 keyword = %s"address"
+        / %s"assert"
+        / %s"assert_eq"
+        / %s"assert_neq"
         / %s"bool"
         / %s"console"
-        / %s"const"
         / %s"constant"
         / %s"decrement"
         / %s"else"
@@ -106,6 +119,7 @@ keyword = %s"address"
         / %s"if"
         / %s"import"
         / %s"in"
+        / %s"inline"
         / %s"increment"
         / %s"let"
         / %s"mapping"
@@ -115,7 +129,6 @@ keyword = %s"address"
         / %s"record"
         / %s"return"
         / %s"scalar"
-        / %s"string"
         / %s"struct"
         / %s"then"
         / %s"transition"
@@ -132,10 +145,6 @@ lowercase-letter = %x61-7A   ; a-z
 letter = uppercase-letter / lowercase-letter
 
 decimal-digit = %x30-39   ; 0-9
-
-octal-digit = %x30-37   ; 0-7
-
-hexadecimal-digit = decimal-digit / "a" / "b" / "c" / "d" / "e" / "f"
 
 identifier = letter *( letter / decimal-digit / "_" )
              ; but not a keyword or a boolean literal or aleo1...
@@ -156,52 +165,6 @@ boolean-literal = %s"true" / %s"false"
 
 address-literal = %s"aleo1" 58( lowercase-letter / decimal-digit )
 
-single-quote = %x27   ; '
-
-double-quote = %x22   ; "
-
-single-quote-escape = "\" single-quote   ; \'
-
-double-quote-escape = "\" double-quote   ; \"
-
-backslash-escape = "\\"
-
-line-feed-escape = %s"\n"
-
-carriage-return-escape = %s"\r"
-
-horizontal-tab-escape = %s"\t"
-
-null-character-escape = "\0"
-
-simple-character-escape = single-quote-escape
-                        / double-quote-escape
-                        / backslash-escape
-                        / line-feed-escape
-                        / carriage-return-escape
-                        / horizontal-tab-escape
-                        / null-character-escape
-
-ascii-character-escape = %s"\x" octal-digit hexadecimal-digit
-
-unicode-character-escape = %s"\u{" 1*6hexadecimal-digit "}"
-
-string-literal = double-quote *string-literal-element double-quote
-
-string-literal-element =
-      not-double-quote-or-backslash-or-line-feed-or-carriage-return
-    / simple-character-escape
-    / ascii-character-escape
-    / unicode-character-escape
-
-not-double-quote-or-backslash-or-line-feed-or-carriage-return =
-      horizontal-tab
-    / %x20-21
-    / %x23-5B
-    / %x5D-7E
-    / safe-nonascii
-    ; anything but " (%x22) and \ (%x5C) and <LF> and <CR>
-
 integer-literal = unsigned-literal
                 / signed-literal
 
@@ -213,7 +176,6 @@ numeric-literal = integer-literal
 atomic-literal = numeric-literal
                / boolean-literal
                / address-literal
-               / string-literal
 
 annotation = "@" identifier
 
@@ -272,10 +234,8 @@ boolean-type = %s"bool"
 
 address-type = %s"address"
 
-string-type = %s"string"
-
 named-primitive-type =
-    boolean-type / arithmetic-type / address-type / string-type
+    boolean-type / arithmetic-type / address-type
 
 unit-type = "(" ")"
 
@@ -298,7 +258,7 @@ literal = atomic-literal / affine-group-literal
 group-literal = product-group-literal / affine-group-literal
 
 primary-expression = literal
-                   / variable-or-free-constant
+                   / variable
                    / associated-constant
                    / "(" expression ")"
                    / free-function-call
@@ -307,7 +267,7 @@ primary-expression = literal
                    / tuple-expression
                    / struct-expression
 
-variable-or-free-constant = identifier
+variable = identifier
 
 associated-constant = named-type "::" identifier
 
@@ -404,7 +364,6 @@ expression = conditional-ternary-expression
 statement = return-statement
           / expression-statement
           / variable-declaration
-          / constant-declaration
           / conditional-statement
           / loop-statement
           / assignment-statement
@@ -421,9 +380,6 @@ return-statement =
 expression-statement = expression ";"
 
 variable-declaration = %s"let" identifier-or-identifiers ":" type
-                       "=" expression ";"
-
-constant-declaration = %s"const" identifier-or-identifiers ":" type
                        "=" expression ";"
 
 identifier-or-identifiers = identifier
@@ -481,19 +437,24 @@ function-declaration = *annotation %s"function" identifier
 
 function-parameters = function-parameter *( "," function-parameter ) [ "," ]
 
-function-parameter = [ %s"public" / %s"private" / %s"constant" / %s"const" ]
+function-parameter = [ %s"public" / %s"private" / %s"constant" ]
                      identifier ":" type
+
+inline-declaration = *annotation %s"inline" identifier
+                     "(" [ function-parameters ] ")"
+                     [ "->" type ]
+                     block
 
 transition-declaration =
     *annotation %s"transition" identifier
     "(" [ function-parameters ] ")"
-    [ "->" [ %s"public" / %s"private" / %s"constant" / %s"const" ] type ]
+    [ "->" [ %s"public" / %s"private" / %s"constant" ] type ]
     block [ finalizer ]
 
 finalizer =
     %s"finalize" identifier
     "(" [ function-parameters ] ")"
-    [ "->" [ %s"public" / %s"private" / %s"constant" / %s"const" ] type ]
+    [ "->" [ %s"public" / %s"private" / %s"constant" ] type ]
     block
 
 struct-declaration = %s"struct" identifier
@@ -503,7 +464,8 @@ struct-component-declarations = struct-component-declaration
                                 *( "," struct-component-declaration )
                                 [ "," ]
 
-struct-component-declaration = identifier ":" type
+struct-component-declaration =
+    [ %s"public" / %s"private" / %s"constant" ] identifier ":" type
 
 record-declaration = %s"record" identifier
                      "{" struct-component-declarations "}"
@@ -511,6 +473,7 @@ record-declaration = %s"record" identifier
 mapping-declaration = %s"mapping" identifier ":" type "=>" type ";"
 
 program-item = function-declaration
+             / inline-declaration
              / transition-declaration
              / struct-declaration
              / record-declaration
@@ -533,7 +496,7 @@ input-expression = expression
 
 input-item = identifier ":" input-type "=" input-expression ";"
 
-input-title = "[" ( %s"public" / %s"private" / %s"constant" / %s"const" ) "]"
+input-title = "[" ( %s"public" / %s"private" / %s"constant" ) "]"
 
 input-section = input-title *input-item
 

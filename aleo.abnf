@@ -1,18 +1,29 @@
 ; Copyright (C) 2022-2023 Aleo Systems Inc.
 ; This file is part of the Aleo library.
 
-; The Leo library is free software: you can redistribute it and/or modify
+; The Aleo library is free software: you can redistribute it and/or modify
 ; it under the terms of the GNU General Public License as published by
 ; the Free Software Foundation, either version 3 of the License, or
 ; (at your option) any later version.
 
-; The Leo library is distributed in the hope that it will be useful,
+; The Aleo library is distributed in the hope that it will be useful,
 ; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ; GNU General Public License for more details.
 
 ; You should have received a copy of the GNU General Public License
-; along with the Leo library. If not, see <https://www.gnu.org/licenses/>.
+; along with the Aleo library. If not, see <https://www.gnu.org/licenses/>.
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; This file specifies the grammar of Aleo instructions in the ABNF notation,
+; which is defined in:
+; - RFC 5234 (https://www.rfc-editor.org/rfc/rfc5234)
+; - RFC 7405 (https://www.rfc-editor.org/rfc/rfc7405)
+
+; Aleo instructions files are written in Unicode, encoded in UTF-8.
+; The grammar in this file applies to the Unicode scalar values
+; that result from the UTF-8 decoding of the files.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -64,8 +75,6 @@ cr = %xD ; carriage return
 
 sp = %x20 ; space
 
-dq = %x22 ; "
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 visible-ascii = %x21-7E
@@ -83,13 +92,11 @@ character = safe-ascii / safe-nonascii
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-escaped-lf = "\" lf ; escaped line feed -- we should disallow this
+escaped-lf = "\" lf ; escaped line feed
 
 plain-ws = ht / sp / lf / cr ; plain (i.e. without escaped-lf) whitespace
 
 ws = *( 1*plain-ws / escaped-lf ) ; whitespace
-
-; we should add and use an explicit notion of line terminator
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -131,7 +138,7 @@ not-star-or-slash = ht
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-cws = ws *( comment / ws ) ; comments and/or whitespace -- optimize this rule
+cws = ws *( comment / ws ) ; comments and/or whitespace
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -144,8 +151,6 @@ letter = uppercase-letter / lowercase-letter
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 digit = %x30-39 ; 0-9
-
-hex-digit = digit / "a" / "b" / "c" / "d" / "e" / "f" ; 0-9 A-F a-f
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -165,7 +170,7 @@ register-access = register *( "." identifier )
 
 signed-literal = [ "-" ] 1*( digit *"_" ) signed-type
 
-unsigned-literal = [ "-" ] 1*( digit *"_" ) unsigned-type ; remove [ "-" ]
+unsigned-literal = [ "-" ] 1*( digit *"_" ) unsigned-type
 
 integer-literal = signed-literal / unsigned-literal
 
@@ -195,39 +200,9 @@ boolean-literal = %s"true" / %s"false"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-string-literal = dq *string-element dq
-
-string-element = not-dq-or-backslash
-               / escaped-char
-               / escaped-ws
-
-not-dq-or-backslash = ht
-                    / lf
-                    / cr
-                    / %x20-21
-                    / %x23-5B
-                    / %x5D-7E
-                    / safe-nonascii
-                    ; anything but " (%x22) and \ (%x5C)
-
-escaped-char = "\" ( dq
-                   / "\"
-                   / "/"
-                   / %s"n"
-                   / %s"r"
-                   / %s"t"
-                   / %s"b"
-                   / %s"f"
-                   / %s"u" "{" 1*6hex-digit "}" )
-
-escaped-ws = "\" 1*plain-ws ; should the ws here start with a line terminator?
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 literal = arithmetic-literal
         / address-literal
         / boolean-literal
-        / string-literal
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -291,7 +266,7 @@ mapping-value = cws %s"value" ws identifier ws %s"as" ws finalize-type ws ";"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-struct = cws %s"struct"  ws identifier ws ":" 1*tuple
+struct = cws %s"struct" ws identifier ws ":" 1*tuple
 
 tuple = cws identifier ws %s"as" ws plaintext-type ws ";"
 
@@ -365,7 +340,7 @@ hash = hash-op ws operand ws %s"into" ws register
 cast = %s"cast" 1*( ws operand )
        ws %s"into" ws register ws %s"as" ws register-type
 
-call = %s"call" ws ( locator / identifier ) ws 1*( ws operand )
+call = %s"call" ws ( locator / identifier ) ws *( ws operand )
        ws %s"into" ws 1*( ws register )
 
 instruction = cws
@@ -394,30 +369,30 @@ finalize-command = cws %s"finalize" *( ws operand ) ws ";"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-function = cws %s"function" ws identifier ws ":"
-           *function-input
-           1*instruction
-           *function-output
+closure = cws %s"closure" ws identifier ws ":"
+          *closure-input
+          1*instruction
+          *closure-output
 
-function-input = cws %s"input" ws register
+closure-input = cws %s"input" ws register
+                ws %s"as" ws register-type ws ";"
+
+closure-output = cws %s"output" ws operand
                  ws %s"as" ws register-type ws ";"
-
-function-output = cws %s"output" ws operand
-                  ws %s"as" ws register-type ws ";"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-transition = cws %s"transition" ws identifier ws ":"
-             *transition-input
-             *instruction
-             *transition-output
-             [ finalize-command finalize ]
+function = cws %s"function" ws identifier ws ":"
+           *function-input
+           *instruction
+           *function-output
+           [ finalize-command finalize ]
 
-transition-input = cws %s"input" ws register
-                   ws %s"as" ws value-type ws ";"
+function-input = cws %s"input" ws register
+                 ws %s"as" ws value-type ws ";"
 
-transition-output = cws %s"output" ws operand
-                    ws %s"as" ws value-type ws ";"
+function-output = cws %s"output" ws operand
+                  ws %s"as" ws value-type ws ";"
 
 finalize = cws %s"finalize" ws identifier ws ":"
            *finalize-input
@@ -434,5 +409,5 @@ finalize-output = cws %s"output" ws operand
 
 program = *import
           cws %s"program" ws program-id ws ";"
-          1*( mapping / struct / record / function / transition )
+          1*( mapping / struct / record / closure / function )
           cws
