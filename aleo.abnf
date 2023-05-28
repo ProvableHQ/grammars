@@ -355,15 +355,20 @@ instruction = cws
               / call )
               ws ";"
 
-decrement = cws %s"decrement"
-            ws identifier "[" ws operand ws "]"
-            ws %s"by" ws operand ws ";"
+get = cws %s"get"
+      ws identifier "[" ws operand ws "]"
+      ws %s"into" ws register ws ";"
 
-increment = cws %s"increment"
-            ws identifier "[" ws operand ws "]"
-            ws %s"by" ws operand ws ";"
+get-or-init = cws %s"get.or_init"
+              ws identifier "[" ws operand ws "]"
+              ws operand
+              ws %s"into" ws register ws ";"
 
-command = decrement / increment / instruction
+set = cws %s"set"
+      ws operand
+      ws %s"into" ws identifier "[" ws operand ws "]" ws ";"
+
+command = get / get-or-init / set / instruction
 
 finalize-command = cws %s"finalize" *( ws operand ) ws ";"
 
