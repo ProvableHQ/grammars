@@ -260,7 +260,7 @@ primary-expression = literal
                    / associated-constant
                    / "(" expression ")"
                    / free-function-call
-                   / static-function-call
+                   / associated-function-call
                    / unit-expression
                    / tuple-expression
                    / struct-expression
@@ -272,7 +272,7 @@ associated-constant = named-type "::" identifier
 free-function-call = identifier function-arguments
                    / locator function-arguments
 
-static-function-call = named-type "::" identifier function-arguments
+associated-function-call = named-type "::" identifier function-arguments
 
 function-arguments = "(" [ expression *( "," expression ) [ "," ] ] ")"
 
