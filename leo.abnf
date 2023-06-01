@@ -290,18 +290,13 @@ struct-component-initializer = identifier
 postfix-expression = primary-expression
                    / tuple-component-expression
                    / struct-component-expression
-                   / operator-call
+                   / method-call
 
 tuple-component-expression = postfix-expression "." numeral
 
 struct-component-expression = postfix-expression "." identifier
 
-operator-call = unary-operator-call / binary-operator-call
-
-unary-operator-call = postfix-expression "." identifier "(" ")"
-
-binary-operator-call =
-    postfix-expression "." identifier "(" expression [ "," ] ")"
+method-call = postfix-expression "." identifier function-arguments
 
 unary-expression = postfix-expression
                  / "!" unary-expression
