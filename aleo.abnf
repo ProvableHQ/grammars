@@ -206,7 +206,11 @@ literal = arithmetic-literal
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-operand = literal / register-access / %s"self.caller" / program-id
+operand = literal
+        / %s"group::GEN"
+        / register-access
+        / %s"self.caller"
+        / program-id
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
