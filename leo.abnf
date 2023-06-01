@@ -104,7 +104,6 @@ keyword = %s"address"
         / %s"bool"
         / %s"console"
         / %s"constant"
-        / %s"decrement"
         / %s"else"
         / %s"field"
         / %s"finalize"
@@ -120,7 +119,6 @@ keyword = %s"address"
         / %s"import"
         / %s"in"
         / %s"inline"
-        / %s"increment"
         / %s"let"
         / %s"mapping"
         / %s"private"
@@ -368,8 +366,6 @@ statement = return-statement
           / loop-statement
           / assignment-statement
           / console-statement
-          / increment-statement
-          / decrement-statement
           / block
 
 block = "{" *statement "}"
@@ -423,12 +419,6 @@ assert-call = %s"assert" "(" expression ")"
 assert-equal-call = %s"assert_eq" "(" expression "," expression [ "," ] ")"
 
 assert-not-equal-call = %s"assert_neq" "(" expression "," expression [ "," ] ")"
-
-increment-statement =
-    %s"increment" "(" identifier "," expression "," expression [ "," ] ")" ";"
-
-decrement-statement =
-    %s"decrement" "(" identifier "," expression "," expression [ "," ] ")" ";"
 
 function-declaration = *annotation %s"function" identifier
                        "(" [ function-parameters ] ")"
