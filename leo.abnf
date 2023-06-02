@@ -104,7 +104,6 @@ keyword = %s"address"
         / %s"bool"
         / %s"console"
         / %s"constant"
-        / %s"decrement"
         / %s"else"
         / %s"field"
         / %s"finalize"
@@ -120,7 +119,6 @@ keyword = %s"address"
         / %s"import"
         / %s"in"
         / %s"inline"
-        / %s"increment"
         / %s"let"
         / %s"mapping"
         / %s"private"
@@ -262,7 +260,7 @@ primary-expression = literal
                    / associated-constant
                    / "(" expression ")"
                    / free-function-call
-                   / static-function-call
+                   / associated-function-call
                    / unit-expression
                    / tuple-expression
                    / struct-expression
@@ -274,7 +272,7 @@ associated-constant = named-type "::" identifier
 free-function-call = identifier function-arguments
                    / locator function-arguments
 
-static-function-call = named-type "::" identifier function-arguments
+associated-function-call = named-type "::" identifier function-arguments
 
 function-arguments = "(" [ expression *( "," expression ) [ "," ] ] ")"
 
@@ -292,18 +290,13 @@ struct-component-initializer = identifier
 postfix-expression = primary-expression
                    / tuple-component-expression
                    / struct-component-expression
-                   / operator-call
+                   / method-call
 
 tuple-component-expression = postfix-expression "." numeral
 
 struct-component-expression = postfix-expression "." identifier
 
-operator-call = unary-operator-call / binary-operator-call
-
-unary-operator-call = postfix-expression "." identifier "(" ")"
-
-binary-operator-call =
-    postfix-expression "." identifier "(" expression [ "," ] ")"
+method-call = postfix-expression "." identifier function-arguments
 
 unary-expression = postfix-expression
                  / "!" unary-expression
@@ -368,8 +361,6 @@ statement = return-statement
           / loop-statement
           / assignment-statement
           / console-statement
-          / increment-statement
-          / decrement-statement
           / block
 
 block = "{" *statement "}"
@@ -423,12 +414,6 @@ assert-call = %s"assert" "(" expression ")"
 assert-equal-call = %s"assert_eq" "(" expression "," expression [ "," ] ")"
 
 assert-not-equal-call = %s"assert_neq" "(" expression "," expression [ "," ] ")"
-
-increment-statement =
-    %s"increment" "(" identifier "," expression "," expression [ "," ] ")" ";"
-
-decrement-statement =
-    %s"decrement" "(" identifier "," expression "," expression [ "," ] ")" ";"
 
 function-declaration = *annotation %s"function" identifier
                        "(" [ function-parameters ] ")"
