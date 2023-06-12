@@ -363,7 +363,7 @@ get = cws %s"get"
       ws identifier "[" ws operand ws "]"
       ws %s"into" ws register ws ";"
 
-get-or-init = cws %s"get.or_init"
+get-or-init = cws %s"get.or_use"
               ws identifier "[" ws operand ws "]"
               ws operand
               ws %s"into" ws register ws ";"
