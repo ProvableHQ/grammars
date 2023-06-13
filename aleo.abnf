@@ -340,11 +340,11 @@ assert = assert-op ws operand ws operand
 
 commit = commit-op ws operand ws operand
          ws %s"into" ws register
-         ws %s"as" ws ( %s"address" / %s"field" / %s"group" )
+         ws %s"as" ws ( address-type / field-type / group-type )
 
 hash = hash-op ws operand
        ws %s"into" ws register
-       ws %s"as" ws ( arithmetic-type / %s"address" )
+       ws %s"as" ws ( arithmetic-type / address-type )
 
 cast = %s"cast" 1*( ws operand )
        ws %s"into" ws register ws %s"as" ws register-type
