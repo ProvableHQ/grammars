@@ -359,20 +359,38 @@ instruction = cws
               / call )
               ws ";"
 
+contains = cws %s"contains"
+           ws identifier "[" ws operand ws "]"
+           ws %s"into" ws register ws ";"
+
 get = cws %s"get"
       ws identifier "[" ws operand ws "]"
       ws %s"into" ws register ws ";"
 
-get-or-init = cws %s"get.or_use"
-              ws identifier "[" ws operand ws "]"
-              ws operand
-              ws %s"into" ws register ws ";"
+get-or-use = cws %s"get.or_use"
+             ws identifier "[" ws operand ws "]"
+             ws operand
+             ws %s"into" ws register ws ";"
 
 set = cws %s"set"
       ws operand
       ws %s"into" ws identifier "[" ws operand ws "]" ws ";"
 
-command = get / get-or-init / set / instruction
+remove = cws %s"remove"
+         ws identifier "[" ws operand ws "]" ws ";"
+
+random  = cws %s"rand.chacha"
+          *2( ws operand )
+          ws %s"into" ws register
+          ws %s"as" literal-type ws ";"
+
+command = contains
+        / get
+        / get-or-use
+        / set
+        / remove
+        / random
+        / instruction
 
 finalize-command = cws %s"finalize" *( ws operand ) ws ";"
 
