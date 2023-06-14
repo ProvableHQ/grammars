@@ -156,7 +156,13 @@ digit = %x30-39 ; 0-9
 
 identifier = letter *( letter / digit / "_" )
 
-program-id = identifier "." identifier
+lowercase-identifier = lowercase-letter *( lowercase-letter / digit / "_" )
+
+program-name = lowercase-identifier
+
+program-domain = lowercase-identifier
+
+program-id = program-name "." program-domain
 
 locator = program-id "/" identifier
 
