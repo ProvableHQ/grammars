@@ -350,6 +350,12 @@ hash-op = hash-bhp-op-prefix ( "256" / "512" / "768" / "1024" )
         / hash-ped-op-prefix ( "64" / "128" )
         / hash-psd-op-prefix ( "2" / "4" / "8" )
 
+cast-op = %s"cast" / %s"cast.lossy"
+
+cast-destination = register-type
+                 / %s"group.x"
+                 / %s"group.y"
+
 unary = unary-op ws ( operand ws ) %s"into" ws register
 
 binary = binary-op ws 2( operand ws ) %s"into" ws register
@@ -364,8 +370,8 @@ commit = commit-op ws operand ws operand ws %s"into" ws register
 
 hash = hash-op ws operand ws %s"into" ws register
 
-cast = %s"cast" 1*( ws operand )
-       ws %s"into" ws register ws %s"as" ws register-type
+cast = cast-op 1*( ws operand )
+       ws %s"into" ws register ws %s"as" ws cast-destination
 
 call = %s"call" ws ( locator / identifier ) ws *( ws operand )
        ws %s"into" ws 1*( ws register )
