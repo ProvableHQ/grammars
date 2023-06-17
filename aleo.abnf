@@ -215,8 +215,9 @@ literal = arithmetic-literal
 operand = literal
         / %s"group::GEN"
         / register-access
-        / %s"self.caller"
         / program-id
+        / %s"self.caller"
+        / %s"block.height"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
