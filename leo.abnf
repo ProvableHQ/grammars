@@ -101,6 +101,7 @@ keyword = %s"address"
         / %s"assert"
         / %s"assert_eq"
         / %s"assert_neq"
+        / %s"block"
         / %s"bool"
         / %s"console"
         / %s"constant"
@@ -127,6 +128,7 @@ keyword = %s"address"
         / %s"record"
         / %s"return"
         / %s"scalar"
+        / %s"self"
         / %s"struct"
         / %s"then"
         / %s"transition"
@@ -264,6 +266,8 @@ primary-expression = literal
                    / unit-expression
                    / tuple-expression
                    / struct-expression
+                   / self-caller
+                   / block-height
 
 variable = identifier
 
@@ -286,6 +290,10 @@ struct-expression = identifier "{" struct-component-initializer
 
 struct-component-initializer = identifier
                              / identifier ":" expression
+
+self-caller = %s"self" "." %s"caller"
+
+block-height = %s"block" "." %s"height"
 
 postfix-expression = primary-expression
                    / tuple-component-expression
