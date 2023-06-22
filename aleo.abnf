@@ -326,29 +326,13 @@ is-op = %s"is.eq" / %s"is.neq"
 
 assert-op = %s"assert.eq" / %s"assert.neq"
 
-commit-bhp-op-prefix = %s"commit.bhp"
-                     / %s"commit_to_group.bhp"
+commit-op = %s"commit.bhp" ( "256" / "512" / "768" / "1024" )
+          / %s"commit.ped" ( "64" / "128" )
 
-commit-ped-op-prefix = %s"commit.ped"
-                     / %s"commit_to_group.ped"
-
-commit-op = commit-bhp-op-prefix ( "256" / "512" / "768" / "1024" )
-          / commit-ped-op-prefix ( "64" / "128" )
-
-hash-bhp-op-prefix = %s"hash.bhp"
-                   / %s"hash_to_group.bhp"
-
-hash-ped-op-prefix = %s"hash.ped"
-                   / %s"hash_to_group.ped"
-
-hash-psd-op-prefix = %s"hash.psd"
-                   / %s"hash_to_group.psd"
-                   / %s"hash_to_scalar.psd"
-                   / %s"hash_many.psd"
-
-hash-op = hash-bhp-op-prefix ( "256" / "512" / "768" / "1024" )
-        / hash-ped-op-prefix ( "64" / "128" )
-        / hash-psd-op-prefix ( "2" / "4" / "8" )
+hash-op = %s"hash.bhp" ( "256" / "512" / "768" / "1024" )
+        / %s"hash.ped" ( "64" / "128" )
+        / %s"hash.psd" ( "2" / "4" / "8" )
+        / %s"hash_many.psd" ( "2" / "4" / "8" )
 
 unary = unary-op ws ( operand ws ) %s"into" ws register
 
@@ -360,9 +344,13 @@ is = is-op ws operand ws operand ws %s"into" ws register
 
 assert = assert-op ws operand ws operand
 
-commit = commit-op ws operand ws operand ws %s"into" ws register
+commit = commit-op ws operand ws operand
+         ws %s"into" ws register
+         ws %s"as" ws ( address-type / field-type / group-type )
 
-hash = hash-op ws operand ws %s"into" ws register
+hash = hash-op ws operand
+       ws %s"into" ws register
+       ws %s"as" ws ( arithmetic-type / address-type )
 
 cast = %s"cast" 1*( ws operand )
        ws %s"into" ws register ws %s"as" ws register-type
