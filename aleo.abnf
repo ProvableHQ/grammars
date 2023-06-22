@@ -350,7 +350,7 @@ hash-op = hash-bhp-op-prefix ( "256" / "512" / "768" / "1024" )
         / hash-ped-op-prefix ( "64" / "128" )
         / hash-psd-op-prefix ( "2" / "4" / "8" )
 
-cast-op = %s"cast" / %s"cast.lossy"
+cast-op = %s"cast"
 
 cast-destination = register-type
                  / %s"group.x"
