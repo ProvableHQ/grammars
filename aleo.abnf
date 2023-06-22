@@ -402,12 +402,22 @@ random  = cws %s"rand.chacha"
           ws %s"into" ws register
           ws %s"as" literal-type ws ";"
 
+label = identifier
+
+position = cws %s"position" ws label ws ";"
+
+branch-op = %s"branch.eq" / %s"branch.neq"
+
+branch = cws branch-op ws operand ws operand ws label ws ";"
+
 command = contains
         / get
         / get-or-use
         / set
         / remove
         / random
+        / position
+        / branch
         / instruction
 
 finalize-command = cws %s"finalize" *( ws operand ) ws ";"
