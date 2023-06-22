@@ -397,7 +397,7 @@ branch-op = %s"branch.eq" / %s"branch.neq"
 
 branch = cws branch-op ws operand ws operand ws label ws ";"
 
-command = get / get-or-init / set / branch / instruction
+command = get / get-or-init / set / branch / instruction / position
 
 finalize-command = cws %s"finalize" *( ws operand ) ws ";"
 
