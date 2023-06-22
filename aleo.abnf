@@ -395,7 +395,15 @@ set = cws %s"set"
       ws operand
       ws %s"into" ws identifier "[" ws operand ws "]" ws ";"
 
-command = get / get-or-init / set / instruction
+label = identifier
+
+position = cws %s"position" ws label ws ";"
+
+branch-op = %s"branch.eq" / %s"branch.neq"
+
+branch = cws branch-op ws operand ws operand ws label ws ";"
+
+command = get / get-or-init / set / branch / instruction / position
 
 finalize-command = cws %s"finalize" *( ws operand ) ws ";"
 
