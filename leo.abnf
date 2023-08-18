@@ -149,7 +149,7 @@ decimal-digit = %x30-39   ; 0-9
 identifier = letter *( letter / decimal-digit / "_" )
              ; but not a keyword or a boolean literal or aleo1...
 
-numeral = 1*decimal-digit
+numeral = 1*( decimal-digit *"_" )
 
 unsigned-literal = numeral ( %s"u8" / %s"u16" / %s"u32" / %s"u64" / %s"u128" )
 
