@@ -146,10 +146,14 @@ letter = uppercase-letter / lowercase-letter
 
 decimal-digit = %x30-39   ; 0-9
 
+nonzero-decimal-digit = %x31-39   ; 1-9
+
 identifier = letter *( letter / decimal-digit / "_" )
              ; but not a keyword or a boolean literal or aleo1...
 
-numeral = 1*decimal-digit
+numeral = 1*( decimal-digit *"_" )
+
+tuple-index = "0" / nonzero-decimal-digit *( decimal-digit )
 
 unsigned-literal = numeral ( %s"u8" / %s"u16" / %s"u32" / %s"u64" / %s"u128" )
 
@@ -300,7 +304,7 @@ postfix-expression = primary-expression
                    / struct-component-expression
                    / method-call
 
-tuple-component-expression = postfix-expression "." numeral
+tuple-component-expression = postfix-expression "." tuple-index
 
 struct-component-expression = postfix-expression "." identifier
 
