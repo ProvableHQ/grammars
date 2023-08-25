@@ -146,6 +146,8 @@ letter = uppercase-letter / lowercase-letter
 
 decimal-digit = %x30-39   ; 0-9
 
+nonzero-decimal-digit = %x31-39   ; 1-9
+
 identifier = letter *( letter / decimal-digit / "_" )
              ; but not a keyword or a boolean literal or aleo1...
 
