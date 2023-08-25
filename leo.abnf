@@ -151,6 +151,8 @@ identifier = letter *( letter / decimal-digit / "_" )
 
 numeral = 1*( decimal-digit *"_" )
 
+whole-number = %x30 / ( %x31-39 *( decimal-digit ) )
+
 unsigned-literal = numeral ( %s"u8" / %s"u16" / %s"u32" / %s"u64" / %s"u128" )
 
 signed-literal = numeral ( %s"i8" / %s"i16" / %s"i32" / %s"i64" / %s"i128" )
@@ -300,7 +302,7 @@ postfix-expression = primary-expression
                    / struct-component-expression
                    / method-call
 
-tuple-component-expression = postfix-expression "." numeral
+tuple-component-expression = postfix-expression "." whole-number
 
 struct-component-expression = postfix-expression "." identifier
 
