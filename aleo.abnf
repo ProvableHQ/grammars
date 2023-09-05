@@ -47,7 +47,6 @@
 ; we can (as the current rules do) enforce requirements
 ; on where comments and whitespace may occur.
 ; The parser also is written according to a single level.
-; All of this may be revisited in the future, if needed.
 
 ; The grammar should be unambiguous
 ; if we take into account the extra-grammatical requirement
@@ -55,7 +54,9 @@
 ; which is a common extra-grammatical requirement,
 ; at least in lexical grammars of two-level grammars,
 ; but should also work for this one-level grammar.
-; We plan to formally prove this eventually.
+; We may also need extra-grammatical requirements
+; to enforce a preference over certain otherwise ambiguous alternatives.
+; We plan to formally prove all of this eventually.
 
 ; The rules below are separated into sections delimited by 40 semicolons.
 ; The sections do not have a very deep significance,
