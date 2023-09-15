@@ -171,7 +171,9 @@ locator = program-id "/" identifier
 
 register = %s"r" 1*digit
 
-register-access = register *( "." identifier )
+register-accessor = "." identifier / "[" u32-literal "]"
+
+register-access = register *register-accessor
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -192,14 +194,19 @@ arithmetic-literal = integer-literal
                    / group-literal
                    / scalar-literal
 
+u32-literal = [ "-" ] 1*( digit *"_" ) %s"u32"
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-address-literal = %s"aleo1" 1*( address-char *"_" )
+address-literal = %s"aleo1" 1*( address-or-signature-char *"_" )
 
-address-char = "0" / "2" / "3" / "4" / "5" / "6" / "7" / "8" / "9"
-             / %s"a" / %s"c" / %s"d" / %s"e" / %s"f" / %s"g" / %s"h" / %s"j"
-             / %s"k" / %s"l" / %s"m" / %s"n" / %s"p" / %s"q" / %s"r" / %s"s"
-             / %s"t" / %s"u" / %s"v" / %s"w" / %s"x" / %s"y" / %s"z"
+signature-literal = %s"sign1" 1*( address-or-signature-char *"_" )
+
+address-or-signature-char =
+    "0" / "2" / "3" / "4" / "5" / "6" / "7" / "8" / "9"
+  / %s"a" / %s"c" / %s"d" / %s"e" / %s"f" / %s"g" / %s"h" / %s"j"
+  / %s"k" / %s"l" / %s"m" / %s"n" / %s"p" / %s"q" / %s"r" / %s"s"
+  / %s"t" / %s"u" / %s"v" / %s"w" / %s"x" / %s"y" / %s"z"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -209,6 +216,7 @@ boolean-literal = %s"true" / %s"false"
 
 literal = arithmetic-literal
         / address-literal
+        / signature-literal
         / boolean-literal
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -242,9 +250,17 @@ boolean-type = %s"boolean"
 
 string-type = %s"string"
 
-literal-type = arithmetic-type / address-type / boolean-type / string-type
+signature-type = %s"signature"
 
-plaintext-type = literal-type / identifier
+literal-type = arithmetic-type
+             / address-type
+             / signature-type
+             / boolean-type
+             / string-type
+
+array-type = "[" ws plaintext-type ws ";" ws u32-literal ws "]"
+
+plaintext-type = literal-type / cws array-type / identifier
 
 value-type = plaintext-type %s".constant"
            / plaintext-type %s".public"
@@ -284,9 +300,7 @@ tuple = cws identifier ws %s"as" ws plaintext-type ws ";"
 
 record = cws %s"record" ws identifier ws ":"
          cws %s"owner" ws %s"as" ws
-         cws ( %s"address.public" / %s"address.private" ) ws ";"
-         cws %s"gates" ws %s"as" ws
-         cws ( %s"u64.public" / %s"u64.private" ) ws ";"
+         ( %s"address.public" / %s"address.private" ) ws ";"
          *entry
 
 entry = cws identifier ws %s"as" ws entry-type ws ";"
@@ -332,12 +346,12 @@ commit-op = %s"commit.bhp" ( "256" / "512" / "768" / "1024" )
 hash1-op = %s"hash.bhp" ( "256" / "512" / "768" / "1024" )
          / %s"hash.ped" ( "64" / "128" )
          / %s"hash.psd" ( "2" / "4" / "8" )
+         / "hash.keccak" ( "256" / "384" / "512" )
+         / "hash.sha3_" ( "256" / "384" / "512" )
 
 hash2-op = %s"hash_many.psd" ( "2" / "4" / "8" )
 
 signverify-op = %s"sign.verify"
-
-cast-op = %s"cast"
 
 cast-destination = register-type
                  / %s"group.x"
@@ -359,22 +373,32 @@ commit = commit-op ws operand ws operand
 
 hash1 = hash1-op ws operand
         ws %s"into" ws register
-        ws %s"as" ws ( arithmetic-type / address-type )
+        ws %s"as" ws
+        ( arithmetic-type
+        / address-type
+        / signature-type
+        / cws array-type
+        / identifier )
 
 hash2 = hash2-op ws operand ws operand
         ws %s"into" ws register
-        ws %s"as" ws ( arithmetic-type / address-type )
+        ws %s"as" ws
+        ( arithmetic-type
+        / address-type
+        / signature-type
+        / cws array-type
+        / identifier )
 
 hash = hash1 / hash2
 
 signverify = signverify-op ws operand ws operand ws operand
              ws %s"into" ws register
 
-cast = cast-op 1*( ws operand )
+cast = %s"cast" 1*( ws operand )
        ws %s"into" ws register ws %s"as" ws cast-destination
 
 call = %s"call" ws ( locator / identifier ) ws *( ws operand )
-       ws [ %s"into" ws *( ws register ) ]
+       ws [ %s"into" ws 1*( ws register ) ]
 
 instruction = cws
               ( unary
@@ -412,7 +436,12 @@ remove = cws %s"remove"
 random  = cws %s"rand.chacha"
           *2( ws operand )
           ws %s"into" ws register
-          ws %s"as" ws literal-type ws ";"
+          ws %s"as" ws
+          ( arithmetic-type
+          / address-type
+          / signature-type
+          / boolean-type )
+          ws ";"
 
 label = identifier
 
@@ -437,7 +466,7 @@ finalize-command = cws %s"finalize" *( ws operand ) ws ";"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 closure = cws %s"closure" ws identifier ws ":"
-          1*closure-input
+          *closure-input
           1*instruction
           *closure-output
 
