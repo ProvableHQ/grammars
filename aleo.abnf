@@ -225,6 +225,7 @@ operand = literal
         / %s"group::GEN"
         / register-access
         / program-id
+        / %s"self.signer"
         / %s"self.caller"
         / %s"block.height"
 
@@ -248,15 +249,12 @@ address-type = %s"address"
 
 boolean-type = %s"boolean"
 
-string-type = %s"string"
-
 signature-type = %s"signature"
 
 literal-type = arithmetic-type
              / address-type
              / signature-type
              / boolean-type
-             / string-type
 
 array-type = "[" ws plaintext-type ws ";" ws u32-literal ws "]"
 
@@ -267,12 +265,17 @@ value-type = plaintext-type %s".constant"
            / plaintext-type %s".private"
            / identifier %s".record"
            / locator %s".record"
+           / locator %s".future"
+
+mapping-type = plaintext-type %s".public"
 
 finalize-type = plaintext-type %s".public"
+              / locator %s".future"
 
 entry-type = plaintext-type ( %s".constant" / %s".public" / %s".private" )
 
-register-type = locator %s".record"
+register-type = locator %s".future"
+              / locator %s".record"
               / identifier %s".record"
               / plaintext-type
 
@@ -286,9 +289,9 @@ mapping = cws %s"mapping" ws identifier ws ":"
           mapping-key
           mapping-value
 
-mapping-key = cws %s"key" ws identifier ws %s"as" ws finalize-type ws ";"
+mapping-key = cws %s"key" ws %s"as" ws mapping-type ws ";"
 
-mapping-value = cws %s"value" ws identifier ws %s"as" ws finalize-type ws ";"
+mapping-value = cws %s"value" ws %s"as" ws mapping-type ws ";"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -334,8 +337,6 @@ binary-op = %s"add" / %s"add.w"
           / %s"lt"
           / %s"lte"
 
-ternary-op = %s"ternary"
-
 is-op = %s"is.eq" / %s"is.neq"
 
 assert-op = %s"assert.eq" / %s"assert.neq"
@@ -351,28 +352,30 @@ hash1-op = %s"hash.bhp" ( "256" / "512" / "768" / "1024" )
 
 hash2-op = %s"hash_many.psd" ( "2" / "4" / "8" )
 
-signverify-op = %s"sign.verify"
+cast-op = %s"cast" / %s"cast.lossy"
 
-cast-destination = register-type
+cast-destination = plaintext-type
+                 / identifier
+                 / locator
                  / %s"group.x"
                  / %s"group.y"
 
-unary = unary-op ws ( operand ws ) %s"into" ws register
+unary = unary-op ws ( operand ws ) %s"into" ws register-access
 
-binary = binary-op ws 2( operand ws ) %s"into" ws register
+binary = binary-op ws 2( operand ws ) %s"into" ws register-access
 
-ternary = ternary-op ws 3( operand ws ) %s"into" ws register
+ternary = %s"ternary" ws 3( operand ws ) %s"into" ws register-access
 
-is = is-op ws operand ws operand ws %s"into" ws register
+is = is-op ws operand ws operand ws %s"into" ws register-access
 
 assert = assert-op ws operand ws operand
 
 commit = commit-op ws operand ws operand
-         ws %s"into" ws register
+         ws %s"into" ws register-access
          ws %s"as" ws ( address-type / field-type / group-type )
 
 hash1 = hash1-op ws operand
-        ws %s"into" ws register
+        ws %s"into" ws register-access
         ws %s"as" ws
         ( arithmetic-type
         / address-type
@@ -381,7 +384,7 @@ hash1 = hash1-op ws operand
         / identifier )
 
 hash2 = hash2-op ws operand ws operand
-        ws %s"into" ws register
+        ws %s"into" ws register-access
         ws %s"as" ws
         ( arithmetic-type
         / address-type
@@ -391,14 +394,17 @@ hash2 = hash2-op ws operand ws operand
 
 hash = hash1 / hash2
 
-signverify = signverify-op ws operand ws operand ws operand
-             ws %s"into" ws register
+signverify = %s"sign.verify" ws operand ws operand ws operand
+             ws %s"into" ws register-access
 
-cast = %s"cast" 1*( ws operand )
-       ws %s"into" ws register ws %s"as" ws cast-destination
+cast = cast-op 1*( ws operand )
+       ws %s"into" ws register-access ws %s"as" ws cast-destination
 
 call = %s"call" ws ( locator / identifier ) ws *( ws operand )
-       ws [ %s"into" ws 1*( ws register ) ]
+       ws [ %s"into" ws 1*( ws register-access ) ]
+
+async = cws %s"async" ws identifier *( ws operand )
+        ws %s"into" ws register-access ws
 
 instruction = cws
               ( unary
@@ -410,21 +416,22 @@ instruction = cws
               / hash
               / signverify
               / cast
-              / call )
+              / call
+              / async )
               ws ";"
 
 contains = cws %s"contains"
            ws identifier "[" ws operand ws "]"
-           ws %s"into" ws register ws ";"
+           ws %s"into" ws register-access ws ";"
 
 get = cws %s"get"
       ws identifier "[" ws operand ws "]"
-      ws %s"into" ws register ws ";"
+      ws %s"into" ws register-access ws ";"
 
 get-or-use = cws %s"get.or_use"
              ws identifier "[" ws operand ws "]"
              ws operand
-             ws %s"into" ws register ws ";"
+             ws %s"into" ws register-access ws ";"
 
 set = cws %s"set"
       ws operand
@@ -435,7 +442,7 @@ remove = cws %s"remove"
 
 random  = cws %s"rand.chacha"
           *2( ws operand )
-          ws %s"into" ws register
+          ws %s"into" ws register-access
           ws %s"as" ws
           ( arithmetic-type
           / address-type
@@ -451,6 +458,8 @@ branch-op = %s"branch.eq" / %s"branch.neq"
 
 branch = cws branch-op ws operand ws operand ws %s"to" ws label ws ";"
 
+await = cws %s"await" ws register-access ws ";"
+
 command = contains
         / get
         / get-or-use
@@ -459,9 +468,8 @@ command = contains
         / random
         / position
         / branch
+        / await
         / instruction
-
-finalize-command = cws %s"finalize" *( ws operand ) ws ";"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -482,7 +490,7 @@ function = cws %s"function" ws identifier ws ":"
            *function-input
            *instruction
            *function-output
-           [ finalize-command finalize ]
+           [ finalize ]
 
 function-input = cws %s"input" ws register
                  ws %s"as" ws value-type ws ";"
