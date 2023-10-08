@@ -258,7 +258,7 @@ literal-type = arithmetic-type
 
 array-type = "[" ws plaintext-type ws ";" ws u32-literal ws "]"
 
-plaintext-type = literal-type / cws array-type / identifier
+plaintext-type = literal-type / array-type / identifier
 
 value-type = plaintext-type %s".constant"
            / plaintext-type %s".public"
@@ -380,7 +380,7 @@ hash1 = hash1-op ws operand
         ( arithmetic-type
         / address-type
         / signature-type
-        / cws array-type
+        / array-type
         / identifier )
 
 hash2 = hash2-op ws operand ws operand
@@ -389,7 +389,7 @@ hash2 = hash2-op ws operand ws operand
         ( arithmetic-type
         / address-type
         / signature-type
-        / cws array-type
+        / array-type
         / identifier )
 
 hash = hash1 / hash2
