@@ -369,6 +369,7 @@ expression = conditional-ternary-expression
 statement = return-statement
           / expression-statement
           / variable-declaration
+          / constant-declaration
           / conditional-statement
           / loop-statement
           / assignment-statement
@@ -384,6 +385,8 @@ expression-statement = expression ";"
 
 variable-declaration = %s"let" identifier-or-identifiers ":" type
                        "=" expression ";"
+
+constant-declaration = %s"const" identifier ":" type "=" expression ";"
 
 identifier-or-identifiers = identifier
                           / "(" identifier 1*( "," identifier ) [ "," ] ")"
@@ -475,6 +478,7 @@ program-item = function-declaration
              / struct-declaration
              / record-declaration
              / mapping-declaration
+             / constant-declaration
 
 program-declaration = %s"program" program-id "{" *program-item "}"
 
