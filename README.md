@@ -17,7 +17,7 @@ Contents of this repository:
 - `leo.abnf` is the ABNF grammar of Leo.
 - `aleo.abnf` is the ABNF grammar of Aleo instructions.
 
-See the [Aleo developer documentation](https://docs.leo-lang.org/getting_started)
+See the [Aleo developer documentation](https://docs.leo-lang.org/)
 for infomation on Leo and Aleo instructions.
 
 See
