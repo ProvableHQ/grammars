@@ -1,5 +1,6 @@
 ; Copyright (C) 2019-2023 Aleo Systems Inc.
-; This file is part of the Aleo library.
+; Copyright (C) 2024 Provable Inc.
+; This file is part of the Leo library.
 
 ; The Leo library is free software: you can redistribute it and/or modify
 ; it under the terms of the GNU General Public License as published by
@@ -30,22 +31,7 @@
 ; Lexical Grammar
 ; ---------------
 
-horizontal-tab = %x9   ; <HT>
-
-line-feed = %xA   ; <LF>
-
-carriage-return = %xD   ; <CR>
-
-space = %x20   ; <SP>
-
-visible-ascii = %x21-7E
-
-safe-ascii = horizontal-tab
-           / line-feed
-           / carriage-return
-           / space
-           / visible-ascii
-           ; excludes control characters 0-8, 11, 12, 14-31, 127
+ascii = %x00-7F
 
 safe-nonascii = %x80-2029 / %x202F-2065 / %x206A-D7FF / %xE000-10FFFF
                 ; excludes bidi embeddings/overrides/isolates
@@ -53,11 +39,25 @@ safe-nonascii = %x80-2029 / %x202F-2065 / %x206A-D7FF / %xE000-10FFFF
                 ; and excludes high/low surrogates
                 ; (i.e. %xD800-DFFF )
 
-character = safe-ascii / safe-nonascii
+character = ascii / safe-nonascii
 
-line-terminator = line-feed / carriage-return / carriage-return line-feed
+line-terminator = line-feed / carriage-return line-feed
 
-whitespace = space / horizontal-tab / line-terminator
+line-feed = %x0A
+
+carriage-return = %x0D
+
+whitespace = space
+           / horizontal-tab
+           / form-feed
+           / line-terminator
+           / carriage-return ; not followed by line feed
+
+space = %x20
+
+horizontal-tab = %x09
+
+form-feed = %x0C
 
 comment = block-comment / line-comment
 
@@ -65,51 +65,55 @@ block-comment = "/*" rest-of-block-comment
 
 rest-of-block-comment =
       "*" rest-of-block-comment-after-star
-    / not-star-or-line-feed-or-carriage-return rest-of-block-comment
+    / not-star-or-line-feed rest-of-block-comment
     / line-terminator rest-of-block-comment
 
 rest-of-block-comment-after-star =
       "/"
     / "*" rest-of-block-comment-after-star
-    / not-star-or-slash-or-line-feed-or-carriage-return rest-of-block-comment
+    / not-star-or-slash-or-line-feed rest-of-block-comment
     / line-terminator rest-of-block-comment
 
-not-star-or-line-feed-or-carriage-return =
-      horizontal-tab
-    / %x20-29
-    / %x2B-7E
-    / safe-nonascii
-    ; anything but * (%x2A) and <LF> and <CR>
+not-star-or-line-feed = %x00-09
+                      ; no line feed (%x0A)
+                      / %x0B-29
+                      ; no * (%x2A)
+                      / %x2B-7E
+                      / safe-nonascii
 
-not-star-or-slash-or-line-feed-or-carriage-return =
-      horizontal-tab
-    / %x20-29
-    / %x2B-2E
-    / %x30-7E
-    / safe-nonascii
-    ; anything but * (%x2A) and / (%x2F) and <LF> and <CR>
+not-star-or-slash-or-line-feed = %x00-09
+                               ; no line feed (%x0A)
+                               / %x0B-29
+                               ; no * (%x2A)
+                               / %x2B-2E
+                               ; no / (%x2F)
+                               / %x30-7E
+                               / safe-nonascii
 
-line-comment = "//" *not-line-feed-or-carriage-return
+line-comment = "//" *not-line-feed line-terminator
 
-not-line-feed-or-carriage-return = horizontal-tab
-                                 / space
-                                 / visible-ascii
-                                 / safe-nonascii
-                                 ; anything but <LF> and <CR>
+not-line-feed = %x00-09
+              ; no line feed (%x0A)
+              / %x0B-7F
+              / safe-nonascii
 
 keyword = %s"address"
+        / %s"aleo"
+        / %s"as"
         / %s"assert"
         / %s"assert_eq"
         / %s"assert_neq"
+        / %s"async"
         / %s"block"
         / %s"bool"
-        / %s"console"
+        / %s"const"
         / %s"constant"
         / %s"else"
         / %s"field"
-        / %s"finalize"
+        / %s"Fn"
         / %s"for"
         / %s"function"
+        / %s"Future"
         / %s"group"
         / %s"i8"
         / %s"i16"
@@ -122,6 +126,7 @@ keyword = %s"address"
         / %s"inline"
         / %s"let"
         / %s"mapping"
+        / %s"network"
         / %s"private"
         / %s"program"
         / %s"public"
@@ -129,8 +134,9 @@ keyword = %s"address"
         / %s"return"
         / %s"scalar"
         / %s"self"
+        / %s"signature"
+        / %s"string"
         / %s"struct"
-        / %s"then"
         / %s"transition"
         / %s"u8"
         / %s"u16"
@@ -138,15 +144,15 @@ keyword = %s"address"
         / %s"u64"
         / %s"u128"
 
-uppercase-letter = %x41-5A   ; A-Z
+uppercase-letter = %x41-5A ; A-Z
 
-lowercase-letter = %x61-7A   ; a-z
+lowercase-letter = %x61-7A ; a-z
 
 letter = uppercase-letter / lowercase-letter
 
-decimal-digit = %x30-39   ; 0-9
+decimal-digit = %x30-39 ; 0-9
 
-nonzero-decimal-digit = %x31-39   ; 1-9
+nonzero-decimal-digit = %x31-39 ; 1-9
 
 identifier = letter *( letter / decimal-digit / "_" )
              ; but not a keyword or a boolean literal or aleo1...
@@ -154,10 +160,14 @@ identifier = letter *( letter / decimal-digit / "_" )
 numeral = 1*( decimal-digit *"_" )
 
 tuple-index = "0" / nonzero-decimal-digit *( decimal-digit )
+              ; i.e. numeral without extra leading zeros
 
 unsigned-literal = numeral ( %s"u8" / %s"u16" / %s"u32" / %s"u64" / %s"u128" )
 
 signed-literal = numeral ( %s"i8" / %s"i16" / %s"i32" / %s"i64" / %s"i128" )
+
+integer-literal = unsigned-literal
+                / signed-literal
 
 field-literal = numeral %s"field"
 
@@ -165,21 +175,33 @@ product-group-literal = numeral %s"group"
 
 scalar-literal = numeral %s"scalar"
 
-boolean-literal = %s"true" / %s"false"
-
-address-literal = %s"aleo1" 58( lowercase-letter / decimal-digit )
-
-integer-literal = unsigned-literal
-                / signed-literal
-
 numeric-literal = integer-literal
                 / field-literal
                 / product-group-literal
                 / scalar-literal
 
+boolean-literal = %s"true" / %s"false"
+
+explicit-address-literal = %s"aleo1" 58( lowercase-letter / decimal-digit )
+
+string-literal = double-quote *string-character double-quote
+
+double-quote = %x22
+
+string-character = not-double-quote-or-line-feed
+                 / line-terminator
+
+not-double-quote-or-line-feed = %x00-09
+                              ; no line feed (%x0A)
+                              / %x0B-21
+                              ; no double quote (%x22)
+                              / %x23-7F
+                              / safe-nonascii
+
 atomic-literal = numeric-literal
                / boolean-literal
-               / address-literal
+               / explicit-address-literal
+               / string-literal
 
 annotation = "@" identifier
 
@@ -216,7 +238,9 @@ lexeme = token / comment / whitespace
 ; Syntactic Grammar
 ; -----------------
 
-program-id = identifier "." identifier
+program-id = identifier "." network
+
+network = %s"aleo"
 
 locator = program-id "/" identifier
 
@@ -238,40 +262,68 @@ boolean-type = %s"bool"
 
 address-type = %s"address"
 
-named-primitive-type =
-    boolean-type / arithmetic-type / address-type
+signature-type = %s"signature"
+
+string-type = %s"string"
+
+named-primitive-type = boolean-type
+                     / arithmetic-type
+                     / address-type
+                     / signature-type
+                     / string-type
 
 unit-type = "(" ")"
 
 primitive-type = named-primitive-type / unit-type
 
-named-type = named-primitive-type
-           / identifier [ "." %s"record" ]
-           / locator [ "." %s"record" ]
+untyped-future-type = %s"Future"
+
+typed-future-type =
+    %s"Future" "<" %s"Fn" "(" [ type 1*( "," type ) [ "," ] ] ")" ">"
+
+future-type = untyped-future-type / typed-future-type
 
 tuple-type = "(" type 1*( "," type ) [ "," ] ")"
 
-type = named-type / unit-type / tuple-type
+array-type = "[" type ";" numeral "]"
+
+type = primitive-type
+     / future-type
+     / tuple-type
+     / array-type
+
+named-type = named-primitive-type
+           / untyped-future-type
+           / identifier
 
 group-coordinate = ( [ "-" ] numeral ) / "+" / "-" / "_"
 
 affine-group-literal = "(" group-coordinate "," group-coordinate %s")group"
 
-literal = atomic-literal / affine-group-literal
+program-address-literal = program-id
+
+literal = atomic-literal
+        / affine-group-literal
+        / program-address-literal
 
 group-literal = product-group-literal / affine-group-literal
 
+address-literal = explicit-address-literal / program-address-literal
+
 primary-expression = literal
                    / variable
+                   / locator
                    / associated-constant
                    / "(" expression ")"
                    / free-function-call
                    / associated-function-call
                    / unit-expression
                    / tuple-expression
+                   / array-expression
                    / struct-expression
-                   / self-caller
-                   / block-height
+                   / self-expression
+                   / block-expression
+                   / network-expression
 
 variable = identifier
 
@@ -288,6 +340,8 @@ unit-expression = "(" ")"
 
 tuple-expression = "(" expression 1*( "," expression ) [ "," ] ")"
 
+array-expression = "[" expression 1*( "," expression ) [ "," ] "]"
+
 struct-expression = identifier "{" struct-component-initializer
                                    *( "," struct-component-initializer )
                                    [ "," ] "}"
@@ -295,16 +349,23 @@ struct-expression = identifier "{" struct-component-initializer
 struct-component-initializer = identifier
                              / identifier ":" expression
 
-self-caller = %s"self" "." %s"caller"
+self-expression = %s"self" "." %s"address"
+                / %s"self" "." %s"caller"
+                / %s"self" "." %s"signer"
 
-block-height = %s"block" "." %s"height"
+block-expression = %s"block" "." %s"height"
+
+network-expression = %s"network" "." %s"id"
 
 postfix-expression = primary-expression
                    / tuple-component-expression
+                   / array-component-expression
                    / struct-component-expression
                    / method-call
 
 tuple-component-expression = postfix-expression "." tuple-index
+
+array-component-expression = postfix-expression "[" expression "]"
 
 struct-component-expression = postfix-expression "." identifier
 
@@ -314,8 +375,10 @@ unary-expression = postfix-expression
                  / "!" unary-expression
                  / "-" unary-expression
 
-exponential-expression = unary-expression
-                       / unary-expression "**" exponential-expression
+cast-expression = unary-expression %s"as" named-primitive-type
+
+exponential-expression = cast-expression
+                       / cast-expression "**" exponential-expression
 
 multiplicative-expression = exponential-expression
                           / multiplicative-expression "*" exponential-expression
@@ -333,12 +396,13 @@ shift-expression = additive-expression
 conjunctive-expression = shift-expression
                        / conjunctive-expression "&" shift-expression
 
-disjunctive-expression = conjunctive-expression
-                       / disjunctive-expression "|" conjunctive-expression
+inclusive-disjunctive-expression =
+      conjunctive-expression
+    / inclusive-disjunctive-expression "|" conjunctive-expression
 
 exclusive-disjunctive-expression =
-      disjunctive-expression
-    / exclusive-disjunctive-expression "^" disjunctive-expression
+      inclusive-disjunctive-expression
+    / exclusive-disjunctive-expression "^" inclusive-disjunctive-expression
 
 ordering-expression =
       exclusive-disjunctive-expression
@@ -366,22 +430,20 @@ conditional-ternary-expression = binary-expression
 
 expression = conditional-ternary-expression
 
-statement = return-statement
-          / expression-statement
+statement = expression-statement
+          / return-statement
           / variable-declaration
           / constant-declaration
           / conditional-statement
           / loop-statement
           / assignment-statement
-          / console-statement
           / block
+
+expression-statement = expression ";"
 
 block = "{" *statement "}"
 
-return-statement =
-    %s"return" [ expression ] [ %s"then" %s"finalize" function-arguments ] ";"
-
-expression-statement = expression ";"
+return-statement = %s"return" [ expression ] ";"
 
 variable-declaration = %s"let" identifier-or-identifiers ":" type
                        "=" expression ";"
@@ -391,14 +453,14 @@ constant-declaration = %s"const" identifier ":" type "=" expression ";"
 identifier-or-identifiers = identifier
                           / "(" identifier 1*( "," identifier ) [ "," ] ")"
 
-branch = %s"if" expression block
+branch = %s"if" conditional-ternary-expression block
 
 conditional-statement = branch
                       / branch %s"else" block
                       / branch %s"else" conditional-statement
 
 loop-statement = %s"for" identifier ":" type
-                 %s"in" expression ".." [ "=" ] expression
+                 %s"in" expression ".." expression
                  block
 
 assignment-operator = "="
@@ -418,44 +480,26 @@ assignment-operator = "="
 
 assignment-statement = expression assignment-operator expression ";"
 
-console-statement = %s"console" "." console-call ";"
+assert-statement = %s"assert" "(" expression ")" ";"
+                 / %s"assert_eq" "(" expression "," expression ")" ";"
+                 / %s"assert_neq" "(" expression "," expression ")" ";"
 
-console-call = assert-call
-             / assert-equal-call
-             / assert-not-equal-call
+function-declaration = *annotation [ %s"async" ] function-kind identifier
+                       "(" [ function-inputs ] ")"
+                       [ "->" function-outputs ]
+                       ( block / ";" )
 
-assert-call = %s"assert" "(" expression ")"
+function-kind = %s"function" / %s"transition" / %s"inline"
 
-assert-equal-call = %s"assert_eq" "(" expression "," expression [ "," ] ")"
+function-inputs = function-input *( "," function-input ) [ "," ]
 
-assert-not-equal-call = %s"assert_neq" "(" expression "," expression [ "," ] ")"
+function-input = [ %s"public" / %s"private" / %s"constant" ]
+                 identifier ":" type
 
-function-declaration = *annotation %s"function" identifier
-                       "(" [ function-parameters ] ")"
-                       [ "->" type ]
-                       block
+function-outputs = function-output
+                 / "(" [ function-output *( "," function-output ) [ "," ] ] ")"
 
-function-parameters = function-parameter *( "," function-parameter ) [ "," ]
-
-function-parameter = [ %s"public" / %s"private" / %s"constant" ]
-                     identifier ":" type
-
-inline-declaration = *annotation %s"inline" identifier
-                     "(" [ function-parameters ] ")"
-                     [ "->" type ]
-                     block
-
-transition-declaration =
-    *annotation %s"transition" identifier
-    "(" [ function-parameters ] ")"
-    [ "->" [ %s"public" / %s"private" / %s"constant" ] type ]
-    block [ finalizer ]
-
-finalizer =
-    %s"finalize" identifier
-    "(" [ function-parameters ] ")"
-    [ "->" [ %s"public" / %s"private" / %s"constant" ] type ]
-    block
+function-output = [ %s"public" / %s"private" / %s"constant" ] type
 
 struct-declaration = %s"struct" identifier
                      "{" struct-component-declarations "}"
@@ -473,8 +517,6 @@ record-declaration = %s"record" identifier
 mapping-declaration = %s"mapping" identifier ":" type "=>" type ";"
 
 program-item = function-declaration
-             / inline-declaration
-             / transition-declaration
              / struct-declaration
              / record-declaration
              / mapping-declaration
@@ -485,35 +527,3 @@ program-declaration = %s"program" program-id "{" *program-item "}"
 import-declaration = %s"import" program-id ";"
 
 file = *import-declaration program-declaration
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; Input Grammar
-; -------------
-
-input-type = type
-
-input-expression = expression
-
-input-item = identifier ":" input-type "=" input-expression ";"
-
-input-title = "[" ( %s"public" / %s"private" / %s"constant" ) "]"
-
-input-section = input-title *input-item
-
-input-file = *input-section
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; Output Grammar
-; --------------
-
-output-expression = expression
-
-output-item = output-expression ";"
-
-output-title = "[" %s"output" "]"
-
-output-section = output-title output-item
-
-output-file = output-section
