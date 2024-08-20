@@ -1,0 +1,96 @@
+# Checks out ACL2 and grammars repositories,
+# copies the Leo ABNF grammar from the ProvableHQ/grammars repo
+# to the ACL2 books projects/leo directory,
+# and certifies the grammar.lisp file that performs consistency checks
+# on the Leo abnf grammar.
+
+name: check-leo-grammar
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: macos-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Get some info
+      - name: Machine information
+        run: |
+          echo 'Hello, ' `pwd` ' $GITHUB_WORKSPACE=' "$GITHUB_WORKSPACE"
+          echo 'uname -a : ' `/usr/bin/uname -a`
+
+      # Checks out the acl2 repository under $GITHUB_WORKSPACE/acl2
+      - name: Checkout ACL2
+        uses: actions/checkout@v4
+        with:
+          repository: 'acl2/acl2'
+          path: 'acl2'
+          # note: the default commit depth is 1
+          # note: there are`with:` params for sparse checkout, in case of size
+          # Note, to check out a specific branch or commit, use "ref:", as in:
+          #ref: 'testing'
+
+      # Note, installing sbcl using brew
+      # is currently sufficient for certifying the leo grammar.
+      # However, more complex computation may require building sbcl with
+      # settings that allow sbcl to use more resources.
+
+      # Note, if we wanted to actually build sbcl here, we would not need to install
+      # everything that we would do with a Docker build, because the Github runner
+      # comes with a lot of things preinstalled.
+
+      - name: Install SBCL and ACL2
+        run: |
+          brew install sbcl
+
+          # Informational:
+          which sbcl
+
+          # Build ACL2
+          cd ${GITHUB_WORKSPACE}
+          cd acl2
+          make update LISP=`which sbcl`
+
+      - name: Check out grammars repo
+        uses: actions/checkout@v4
+        with:
+          repository: 'ProvableHQ/grammars'
+          path: 'grammars'
+
+      - name: Grammar files info
+        run: |
+          cd ${GITHUB_WORKSPACE}
+          wc grammars/leo.abnf
+          wc acl2/books/projects/leo/grammar.abnf
+          # The above is prior to being overwritten in the next task.
+
+      - name: Copy ABNF file
+        run: cp ${GITHUB_WORKSPACE}/grammars/leo.abnf ${GITHUB_WORKSPACE}/acl2/books/projects/leo/grammar.abnf
+
+      - name: Certify grammar.lisp file
+        run: |
+          cd ${GITHUB_WORKSPACE}
+          cd acl2
+          export ACL2=`pwd`/saved_acl2
+          export ACL2_SYSTEM_BOOKS=`pwd`/books
+          export PATH="${ACL2_SYSTEM_BOOKS}"/build:"${PATH}"
+          cd books
+          echo 'Print out the ABNF grammar, so we have a record of what was checked.'
+          echo '------------------------------'
+          cat projects/leo/grammar.abnf
+          echo '------------------------------'
+          # As of 2024-08-20, macos-latest runners on public repos allow 4 cores.
+          cert.pl -j4 projects/leo/grammar
