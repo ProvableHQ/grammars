@@ -2,7 +2,7 @@
 # copies the Leo ABNF grammar from the ProvableHQ/grammars repo
 # to the ACL2 books projects/leo directory,
 # and certifies the grammar.lisp file that performs consistency checks
-# on the Leo abnf grammar.
+# on the Leo ABNF grammar.
 
 name: check-leo-grammar
 
@@ -43,13 +43,13 @@ jobs:
           # Note, to check out a specific branch or commit, use "ref:", as in:
           #ref: 'testing'
 
-      # Note, installing sbcl using brew
-      # is currently sufficient for certifying the leo grammar.
-      # However, more complex computation may require building sbcl with
+      # Note, installing SBCL using brew
+      # is currently sufficient for certifying the Leo grammar.
+      # However, more complex computation may require building SBCL with
       # settings that allow sbcl to use more resources.
 
-      # Note, if we wanted to actually build sbcl here, we would not need to install
-      # everything that we would do with a Docker build, because the Github runner
+      # Note, if we wanted to actually build SBCL here, we would not need to install
+      # everything that we would do with a Docker build, because the GitHub runner
       # comes with a lot of things preinstalled.
 
       - name: Install SBCL and ACL2
