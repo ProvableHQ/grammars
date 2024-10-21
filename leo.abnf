@@ -167,7 +167,7 @@ identifier = letter *( letter / decimal-digit / "_" )
 
 binary-numeral = 1*( binary-digit *"_" )
 
-octal-numeral = 1*( octal-digit *"_" )
+octal-numeral = "0o" 1*( octal-digit *"_" )
 
 decimal-numeral = 1*( decimal-digit *"_" )
 
