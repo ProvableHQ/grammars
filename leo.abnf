@@ -150,17 +150,36 @@ lowercase-letter = %x61-7A ; a-z
 
 letter = uppercase-letter / lowercase-letter
 
+binary-digit = %x30-31 ; 0-1
+
+octal-digit = %x30-37 ; 0-7
+
 decimal-digit = %x30-39 ; 0-9
 
 nonzero-decimal-digit = %x31-39 ; 1-9
 
+hexadecimal-digit = decimal-digit
+                  / %x41-46 ; A-F (uppercase)
+                  ; no a-f (lowercase)
+
 identifier = letter *( letter / decimal-digit / "_" )
              ; but not a keyword or a boolean literal or aleo1...
 
-numeral = 1*( decimal-digit *"_" )
+binary-numeral = 1*( binary-digit *"_" )
+
+octal-numeral = 1*( octal-digit *"_" )
+
+decimal-numeral = 1*( decimal-digit *"_" )
+
+hexadecimal-numeral = 1*( hexadecimal-digit *"_" )
+
+numeral = binary-numeral
+        / octal-numeral
+        / decimal-numeral
+        / hexadecimal-numeral
 
 tuple-index = "0" / nonzero-decimal-digit *( decimal-digit )
-              ; i.e. numeral without extra leading zeros
+              ; i.e. decimal-numeral without extra leading zeros
 
 unsigned-literal = numeral ( %s"u8" / %s"u16" / %s"u32" / %s"u64" / %s"u128" )
 
