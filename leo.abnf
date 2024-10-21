@@ -165,7 +165,7 @@ hexadecimal-digit = decimal-digit
 identifier = letter *( letter / decimal-digit / "_" )
              ; but not a keyword or a boolean literal or aleo1...
 
-binary-numeral = 1*( binary-digit *"_" )
+binary-numeral = "0b" 1*( binary-digit *"_" )
 
 octal-numeral = "0o" 1*( octal-digit *"_" )
 
