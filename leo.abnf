@@ -171,7 +171,7 @@ octal-numeral = "0o" 1*( octal-digit *"_" )
 
 decimal-numeral = 1*( decimal-digit *"_" )
 
-hexadecimal-numeral = 1*( hexadecimal-digit *"_" )
+hexadecimal-numeral = "0x" 1*( hexadecimal-digit *"_" )
 
 numeral = binary-numeral
         / octal-numeral
