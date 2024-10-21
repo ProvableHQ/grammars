@@ -165,13 +165,13 @@ hexadecimal-digit = decimal-digit
 identifier = letter *( letter / decimal-digit / "_" )
              ; but not a keyword or a boolean literal or aleo1...
 
-binary-numeral = "0b" 1*( binary-digit *"_" )
+binary-numeral = %s"0b" 1*( binary-digit *"_" )
 
-octal-numeral = "0o" 1*( octal-digit *"_" )
+octal-numeral = %s"0o" 1*( octal-digit *"_" )
 
 decimal-numeral = 1*( decimal-digit *"_" )
 
-hexadecimal-numeral = "0x" 1*( hexadecimal-digit *"_" )
+hexadecimal-numeral = %s"0x" 1*( hexadecimal-digit *"_" )
 
 numeral = binary-numeral
         / octal-numeral
