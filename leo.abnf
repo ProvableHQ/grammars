@@ -394,7 +394,8 @@ unary-expression = postfix-expression
                  / "!" unary-expression
                  / "-" unary-expression
 
-cast-expression = unary-expression %s"as" named-primitive-type
+cast-expression = unary-expression
+                / unary-expression %s"as" named-primitive-type
 
 exponential-expression = cast-expression
                        / cast-expression "**" exponential-expression
