@@ -474,7 +474,7 @@ command = contains
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 closure = cws %s"closure" ws identifier ws ":"
-          *closure-input
+          1*closure-input
           1*instruction
           *closure-output
 
