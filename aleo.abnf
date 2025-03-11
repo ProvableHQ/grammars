@@ -221,13 +221,14 @@ literal = arithmetic-literal
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-operand = literal
-        / %s"group::GEN"
-        / register-access
-        / program-id
+operand = %s"group::GEN"
         / %s"self.signer"
         / %s"self.caller"
         / %s"block.height"
+        / %s"network.id"
+        / program-id
+        / literal
+        / register-access
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
