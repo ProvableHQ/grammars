@@ -221,13 +221,14 @@ literal = arithmetic-literal
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-operand = literal
-        / %s"group::GEN"
-        / register-access
-        / program-id
+operand = %s"group::GEN"
         / %s"self.signer"
         / %s"self.caller"
         / %s"block.height"
+        / %s"network.id"
+        / program-id
+        / literal
+        / register-access
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -474,7 +475,7 @@ command = contains
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 closure = cws %s"closure" ws identifier ws ":"
-          *closure-input
+          1*closure-input
           1*instruction
           *closure-output
 
