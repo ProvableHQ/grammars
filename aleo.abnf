@@ -345,13 +345,11 @@ assert-op = %s"assert.eq" / %s"assert.neq"
 commit-op = %s"commit.bhp" ( "256" / "512" / "768" / "1024" )
           / %s"commit.ped" ( "64" / "128" )
 
-hash1-op = %s"hash.bhp" ( "256" / "512" / "768" / "1024" )
-         / %s"hash.ped" ( "64" / "128" )
-         / %s"hash.psd" ( "2" / "4" / "8" )
-         / %s"hash.keccak" ( "256" / "384" / "512" )
-         / %s"hash.sha3_" ( "256" / "384" / "512" )
-
-hash2-op = %s"hash_many.psd" ( "2" / "4" / "8" )
+hash-op = %s"hash.bhp" ( "256" / "512" / "768" / "1024" )
+        / %s"hash.ped" ( "64" / "128" )
+        / %s"hash.psd" ( "2" / "4" / "8" )
+        / %s"hash.keccak" ( "256" / "384" / "512" )
+        / %s"hash.sha3_" ( "256" / "384" / "512" )
 
 cast-op = %s"cast" / %s"cast.lossy"
 
@@ -375,25 +373,14 @@ commit = commit-op ws operand ws operand
          ws %s"into" ws register-access
          ws %s"as" ws ( address-type / field-type / group-type )
 
-hash1 = hash1-op ws operand
-        ws %s"into" ws register-access
-        ws %s"as" ws
-        ( arithmetic-type
-        / address-type
-        / signature-type
-        / array-type
-        / identifier )
-
-hash2 = hash2-op ws operand ws operand
-        ws %s"into" ws register-access
-        ws %s"as" ws
-        ( arithmetic-type
-        / address-type
-        / signature-type
-        / array-type
-        / identifier )
-
-hash = hash1 / hash2
+hash = hash-op ws operand
+       ws %s"into" ws register-access
+       ws %s"as" ws
+       ( arithmetic-type
+       / address-type
+       / signature-type
+       / array-type
+       / identifier )
 
 signverify = %s"sign.verify" ws operand ws operand ws operand
              ws %s"into" ws register-access
