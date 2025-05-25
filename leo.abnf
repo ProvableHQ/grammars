@@ -357,8 +357,7 @@ struct-expression = identifier "{" struct-component-initializer
                                    *( "," struct-component-initializer )
                                    [ "," ] "}"
 
-struct-component-initializer = identifier
-                             / identifier ":" expression
+struct-component-initializer = identifier [ ":" expression ]
 
 self-expression = %s"self" "." %s"address"
                 / %s"self" "." %s"caller"
