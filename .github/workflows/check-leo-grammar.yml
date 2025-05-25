@@ -1,6 +1,6 @@
 # Checks out ACL2 and grammars repositories,
 # copies the Leo ABNF grammar from the ProvableHQ/grammars repo
-# to the ACL2 books projects/leo directory,
+# to the ACL2 books projects/aleo/leo directory,
 # and certifies the grammar.lisp file that performs consistency checks
 # on the Leo ABNF grammar.
 
@@ -74,11 +74,11 @@ jobs:
         run: |
           cd ${GITHUB_WORKSPACE}
           wc grammars/leo.abnf
-          wc acl2/books/projects/leo/grammar.abnf
+          wc acl2/books/projects/aleo/leo/grammar.abnf
           # The above is prior to being overwritten in the next task.
 
       - name: Copy ABNF file
-        run: cp ${GITHUB_WORKSPACE}/grammars/leo.abnf ${GITHUB_WORKSPACE}/acl2/books/projects/leo/grammar.abnf
+        run: cp ${GITHUB_WORKSPACE}/grammars/leo.abnf ${GITHUB_WORKSPACE}/acl2/books/projects/aleo/leo/grammar.abnf
 
       - name: Certify grammar.lisp file
         run: |
@@ -90,7 +90,7 @@ jobs:
           cd books
           echo 'Print out the ABNF grammar, so we have a record of what was checked.'
           echo '------------------------------'
-          cat projects/leo/grammar.abnf
+          cat projects/aleo/leo/grammar.abnf
           echo '------------------------------'
           # As of 2024-08-20, macos-latest runners on public repos allow 4 cores.
-          cert.pl -j4 projects/leo/grammar
+          cert.pl -j4 projects/aleo/leo/grammar
