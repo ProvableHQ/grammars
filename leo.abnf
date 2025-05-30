@@ -198,6 +198,7 @@ numeric-literal = integer-literal
                 / field-literal
                 / group-literal
                 / scalar-literal
+                / numeral 
 
 boolean-literal = %s"true" / %s"false"
 
