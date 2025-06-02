@@ -133,6 +133,7 @@ keyword = %s"address"
         / %s"record"
         / %s"return"
         / %s"scalar"
+        / %s"script"
         / %s"self"
         / %s"signature"
         / %s"string"
@@ -198,6 +199,7 @@ numeric-literal = integer-literal
                 / field-literal
                 / group-literal
                 / scalar-literal
+                / numeral 
 
 boolean-literal = %s"true" / %s"false"
 
@@ -500,17 +502,17 @@ function-declaration = *annotation [ %s"async" ] function-kind identifier
                        [ "->" function-outputs ]
                        ( block / ";" )
 
-function-kind = %s"function" / %s"transition" / %s"inline"
+function-kind = %s"function" / %s"transition" / %s"inline" / %s"script"
 
 function-inputs = function-input *( "," function-input ) [ "," ]
 
-function-input = [ %s"public" / %s"private" / %s"constant" ]
+function-input = [ %s"public" / %s"private" ]
                  identifier ":" type
 
 function-outputs = function-output
                  / "(" [ function-output *( "," function-output ) [ "," ] ] ")"
 
-function-output = [ %s"public" / %s"private" / %s"constant" ] type
+function-output = [ %s"public" / %s"private" ] type
 
 struct-declaration = %s"struct" identifier
                      "{" struct-component-declarations "}"
