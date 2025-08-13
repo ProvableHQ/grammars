@@ -305,14 +305,17 @@ future-type = untyped-future-type / typed-future-type
 
 tuple-type = "(" type 1*( "," type ) [ "," ] ")"
 
-array-type = "[" type ";" decimal-numeral "]"
+array-type = "[" type ";" expression "]"
+
+named-type = identifier [ const-arguments ]
 
 type = primitive-type
+     / named-type 
      / future-type
      / tuple-type
      / array-type
 
-named-type = named-primitive-type
+scoped-type = named-primitive-type
            / untyped-future-type
            / identifier
 
@@ -322,6 +325,12 @@ literal = atomic-literal
         / program-address-literal
 
 address-literal = explicit-address-literal / program-address-literal
+
+const-arguments = "::" "[" [ expression 1*( "," expression ) [ "," ] ] "]"
+
+const-parameters = "::" "[" [ const-parameter *( "," const-parameter ) [ "," ] ] "]"
+
+const-parameter = identifier ":" type
 
 primary-expression = literal
                    / variable
@@ -333,19 +342,21 @@ primary-expression = literal
                    / unit-expression
                    / tuple-expression
                    / array-expression
+                   / repeat-expression
                    / struct-expression
                    / self-expression
                    / block-expression
                    / network-expression
+                   / async-expression
 
 variable = identifier
 
-associated-constant = named-type "::" identifier
+associated-constant = scoped-type "::" identifier
 
-free-function-call = identifier function-arguments
+free-function-call = identifier [ const-arguments ] function-arguments
                    / locator function-arguments
 
-associated-function-call = named-type "::" identifier function-arguments
+associated-function-call = scoped-type "::" identifier function-arguments
 
 function-arguments = "(" [ expression *( "," expression ) [ "," ] ] ")"
 
@@ -355,9 +366,12 @@ tuple-expression = "(" expression 1*( "," expression ) [ "," ] ")"
 
 array-expression = "[" expression 1*( "," expression ) [ "," ] "]"
 
-struct-expression = identifier "{" struct-component-initializer
-                                   *( "," struct-component-initializer )
-                                   [ "," ] "}"
+repeat-expression = "[" expression ";" expression "]"
+
+struct-expression = identifier [ const-arguments ]
+                    "{" struct-component-initializer
+                    *( "," struct-component-initializer )
+                    [ "," ] "}"
 
 struct-component-initializer = identifier [ ":" expression ]
 
@@ -368,6 +382,8 @@ self-expression = %s"self" "." %s"address"
 block-expression = %s"block" "." %s"height"
 
 network-expression = %s"network" "." %s"id"
+
+async-expression = %s"async" block
 
 postfix-expression = primary-expression
                    / tuple-component-expression
@@ -498,6 +514,7 @@ assert-statement = %s"assert" "(" expression ")" ";"
                  / %s"assert_neq" "(" expression "," expression ")" ";"
 
 function-declaration = *annotation [ %s"async" ] function-kind identifier
+                       [ const-parameters ]
                        "(" [ function-inputs ] ")"
                        [ "->" function-outputs ]
                        ( block / ";" )
@@ -515,6 +532,7 @@ function-outputs = function-output
 function-output = [ %s"public" / %s"private" ] type
 
 struct-declaration = %s"struct" identifier
+                     [ const-parameters ]
                      "{" struct-component-declarations "}"
 
 struct-component-declarations = struct-component-declaration
